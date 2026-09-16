@@ -3,10 +3,18 @@ import { useState, useEffect } from 'react';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
-const DETECTIONS_DATA = Array.from({length: 30}).map((_, i) => ({
-  date: `2026-08-${i+1}`,
-  count: Math.floor(Math.random() * 15) + 2
-}));
+const DETECTIONS_DATA = [
+  { date: '2026-08-01', count: 4 }, { date: '2026-08-02', count: 7 }, { date: '2026-08-03', count: 3 },
+  { date: '2026-08-04', count: 12 }, { date: '2026-08-05', count: 8 }, { date: '2026-08-06', count: 5 },
+  { date: '2026-08-07', count: 9 }, { date: '2026-08-08', count: 11 }, { date: '2026-08-09', count: 2 },
+  { date: '2026-08-10', count: 6 }, { date: '2026-08-11', count: 14 }, { date: '2026-08-12', count: 5 },
+  { date: '2026-08-13', count: 8 }, { date: '2026-08-14', count: 10 }, { date: '2026-08-15', count: 3 },
+  { date: '2026-08-16', count: 7 }, { date: '2026-08-17', count: 13 }, { date: '2026-08-18', count: 9 },
+  { date: '2026-08-19', count: 4 }, { date: '2026-08-20', count: 11 }, { date: '2026-08-21', count: 6 },
+  { date: '2026-08-22', count: 8 }, { date: '2026-08-23', count: 15 }, { date: '2026-08-24', count: 5 },
+  { date: '2026-08-25', count: 9 }, { date: '2026-08-26', count: 12 }, { date: '2026-08-27', count: 7 },
+  { date: '2026-08-28', count: 4 }, { date: '2026-08-29', count: 10 }, { date: '2026-08-30', count: 8 },
+];
 
 const CONFIDENCE_DATA = [
   { range: '0-50%', count: 12 },

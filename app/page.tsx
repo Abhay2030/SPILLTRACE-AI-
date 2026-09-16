@@ -1,8 +1,14 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
-import DemoController from '@/components/demo/DemoController';
+import { useAppStore } from '@/lib/state/useAppStore';
+import { AnimatePresence, motion } from 'motion/react';
+import InvestigationWorkflow from '@/components/workstation/InvestigationWorkflow';
+import WorkstationContextPanel from '@/components/workstation/WorkstationContextPanel';
+import InvestigationTimeline from '@/components/workstation/InvestigationTimeline';
 
-// Dynamic imports for each chapter (code splitting with named exports)
+// Legacy Chapters (now used only for Presentation Mode)
 const Chapter01 = dynamic(() => import('@/components/homepage/Chapter01Ocean').then(m => m.Chapter01Ocean));
 const Chapter02 = dynamic(() => import('@/components/homepage/Chapter02Watch').then(m => m.Chapter02Watch));
 const Chapter03 = dynamic(() => import('@/components/homepage/Chapter03Satellite').then(m => m.Chapter03Satellite));
@@ -25,30 +31,67 @@ const Chapter19 = dynamic(() => import('@/components/homepage/Chapter19System').
 const Chapter20 = dynamic(() => import('@/components/homepage/Chapter20Final').then(m => m.Chapter20Final));
 
 export default function HomePage() {
+  const presentationMode = useAppStore(state => state.presentationMode);
+  const focusMode = useAppStore(state => state.focusMode);
+
   return (
-    <div className="relative">
+    <div className="relative min-h-screen pt-16">
       <DataModeIndicator mode="DEMO" />
-      <DemoController />
-      <Chapter01 />
-      <Chapter02 />
-      <Chapter03 />
-      <Chapter04 />
-      <Chapter05 />
-      <Chapter06 />
-      <Chapter07 />
-      <Chapter08 />
-      <Chapter09 />
-      <Chapter10 />
-      <Chapter11 />
-      <Chapter12 />
-      <Chapter13 />
-      <Chapter14 />
-      <Chapter15 />
-      <Chapter16 />
-      <Chapter17 />
-      <Chapter18 />
-      <Chapter19 />
-      <Chapter20 />
+      
+      {/* 
+        ============================================================
+        WORKSTATION MODE (DEFAULT)
+        ============================================================
+      */}
+      <AnimatePresence>
+        {!presentationMode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 pt-16 pointer-events-none z-10"
+          >
+            {/* Left Panel: Workflow Steps */}
+            {!focusMode && <InvestigationWorkflow />}
+            
+            {/* Right Panel: Context / Evidence */}
+            {!focusMode && <WorkstationContextPanel />}
+            
+            {/* Bottom Panel: Timeline Scrubber */}
+            {!focusMode && <InvestigationTimeline />}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 
+        ============================================================
+        PRESENTATION MODE (AUTOPLAY TOUR)
+        ============================================================
+      */}
+      {presentationMode && (
+        <div className="relative z-20 pointer-events-auto">
+          <Chapter01 />
+          <Chapter02 />
+          <Chapter03 />
+          <Chapter04 />
+          <Chapter05 />
+          <Chapter06 />
+          <Chapter07 />
+          <Chapter08 />
+          <Chapter09 />
+          <Chapter10 />
+          <Chapter11 />
+          <Chapter12 />
+          <Chapter13 />
+          <Chapter14 />
+          <Chapter15 />
+          <Chapter16 />
+          <Chapter17 />
+          <Chapter18 />
+          <Chapter19 />
+          <Chapter20 />
+        </div>
+      )}
     </div>
   );
 }

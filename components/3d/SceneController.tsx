@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useAppStore } from '@/lib/state/useAppStore';
+
 import Earth from './Earth';
 import Ocean from './Ocean';
 import Clouds from './Clouds';
@@ -14,7 +16,22 @@ import SpillShape from './SpillShape';
 import ProbabilityField from './ProbabilityField';
 import ScanBeam from './ScanBeam';
 import RouteTrail from './RouteTrail';
-import { CHAPTER_CAMERAS, CameraKeyframe } from '@/lib/three/camera-positions';
+import { CHAPTER_CAMERAS } from '@/lib/three/camera-positions';
+
+// Map the 11 Workstation Workflow Steps to their visual equivalent Chapters
+const WORKFLOW_TO_CHAPTER_MAP: Record<number, number> = {
+  1: 3,  // Observe (Satellite overhead)
+  2: 4,  // Detect (SAR Scanning)
+  3: 5,  // Validate (Classification)
+  4: 6,  // Characterize (Geometry)
+  5: 8,  // Trace (Origin probability)
+  6: 11, // Correlate (AIS filtering)
+  7: 12, // Attribute (Candidates)
+  8: 15, // Verify (Evidence)
+  9: 10, // Assess (Threat)
+  10: 16, // Respond (Assets)
+  11: 18, // Monitor (Post-response)
+};
 
 function getInterpolatedCamera(chapter: number, progress: number): { position: THREE.Vector3; target: THREE.Vector3; fov: number } {
   const currentKey = Math.min(Math.max(chapter, 1), 20);
@@ -64,48 +81,61 @@ function getSceneState(chapter: number, progress: number) {
     spillProgress: chapter === 7 ? 1 - progress : chapter >= 4 ? Math.min(1, Math.max(0.1, (chapter - 4) * 0.3 + progress * 0.2)) : 0,
     showProbabilityField: chapter >= 8 && chapter <= 15,
     showDriftPath: chapter >= 9 && chapter <= 14,
-    // Smooth planetary rotation during global overview chapters; stabilize on Arabian Sea coordinate frame during investigation
     earthRotation: chapter <= 2 || chapter >= 18 ? 0.0006 : 0.0,
   };
 }
 
 export default function SceneController() {
   const { camera } = useThree();
-  const [chapter, setChapter] = useState(1);
-  const [progress, setProgress] = useState(0);
+  const presentationMode = useAppStore(state => state.presentationMode);
+  const workflowStep = useAppStore(state => state.workflowStep);
+  const timelineHour = useAppStore(state => state.timelineHour);
+
+  const [scrollChapter, setScrollChapter] = useState(1);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const currentTarget = useRef(new THREE.Vector3(0, 0, 0));
   const currentFov = useRef(45);
 
   useEffect(() => {
     const handleScroll = () => {
+      // Only track scroll if in presentation mode
+      if (!presentationMode) return;
+      
       const scrollY = window.scrollY;
       const vh = window.innerHeight || 1;
       const rawChapter = scrollY / vh + 1;
       const currentChapter = Math.max(1, Math.min(20, Math.floor(rawChapter)));
       const currentProgress = Math.max(0, Math.min(1, rawChapter - currentChapter));
 
-      setChapter(currentChapter);
-      setProgress(currentProgress);
+      setScrollChapter(currentChapter);
+      setScrollProgress(currentProgress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [presentationMode]);
 
-  const state = getSceneState(chapter, progress);
-  const targetCam = getInterpolatedCamera(chapter, progress);
+  // Determine actual chapter and progress based on mode
+  const activeChapter = presentationMode ? scrollChapter : WORKFLOW_TO_CHAPTER_MAP[workflowStep] || 1;
+  
+  // In Workstation mode, we can use the timelineHour to drive sub-progress for rewinds
+  let activeProgress = presentationMode ? scrollProgress : 1.0;
+  
+  if (!presentationMode && workflowStep === 5) {
+     // Trace Step: timelineHour [-24 to 0] drives rewind progress
+     activeProgress = Math.abs(timelineHour) / 24; 
+  }
+
+  const state = getSceneState(activeChapter, activeProgress);
+  const targetCam = getInterpolatedCamera(activeChapter, activeProgress);
 
   useFrame((_state, delta) => {
-    // Smooth camera position interpolation with physical inertia
     camera.position.lerp(targetCam.position, 2.2 * delta);
-
-    // Smooth camera target interpolation
     currentTarget.current.lerp(targetCam.target, 2.6 * delta);
     camera.lookAt(currentTarget.current);
 
-    // Smooth FOV interpolation if perspective camera
     if ('fov' in camera) {
       const persCamera = camera as THREE.PerspectiveCamera;
       currentFov.current = THREE.MathUtils.lerp(currentFov.current, targetCam.fov, 2.2 * delta);
@@ -118,34 +148,26 @@ export default function SceneController() {
 
   return (
     <>
-      {/* 1. Unified Solar Illumination Engine (Single coherent directional sun) */}
       <ambientLight intensity={0.14} color="#0c1e36" />
-      <directionalLight
-        intensity={1.4}
-        position={[5.0, 3.0, 4.0]}
-        color="#fffaf0"
-      />
-      {/* Soft atmospheric earthshine bounce on dark side */}
+      <directionalLight intensity={1.4} position={[5.0, 3.0, 4.0]} color="#fffaf0" />
       <pointLight intensity={0.25} position={[-5.0, -2.0, -4.0]} color="#0369a1" />
 
       {state.showStars && <Stars />}
 
-      {/* Planetary Group: Synchronized coordinate frame for Earth, Ocean, Clouds, Spill & Fleet */}
       <group rotation-y={0}>
         {state.showEarth && <Earth rotationSpeed={state.earthRotation} />}
         {state.showAtmosphere && <Atmosphere />}
-        {state.showOcean && <Ocean opacity={chapter === 2 ? progress : 1} />}
+        {state.showOcean && <Ocean opacity={activeChapter === 2 ? activeProgress : 1} />}
         {state.showEarth && <Clouds />}
         {state.showSpill && (
           <SpillShape
             visible={state.showSpill}
             progress={state.spillProgress}
-            rewindProgress={chapter === 7 ? progress : 0}
+            rewindProgress={activeChapter === 7 || (!presentationMode && workflowStep === 5) ? activeProgress : 0}
           />
         )}
         {state.showProbabilityField && <ProbabilityField visible={state.showProbabilityField} intensity={0.8} />}
 
-        {/* 247 Maritime Fleet: Locked to geographic oceanic coordinates */}
         {state.showShips && (
           <ShipFleet
             visibleCount={state.shipCount}
@@ -154,17 +176,15 @@ export default function SceneController() {
         )}
       </group>
 
-      {/* LEO Spacecraft & Synthetic Aperture Radar Footprint */}
-      {state.showSatellite && <Satellite visible={state.showSatellite} orbitProgress={progress} />}
+      {state.showSatellite && <Satellite visible={state.showSatellite} orbitProgress={activeProgress} />}
       {state.showScanBeam && (
         <ScanBeam
           visible={state.showScanBeam}
-          scanProgress={progress}
-          state={chapter === 3 ? 'PENDING' : chapter === 4 ? 'SCANNING' : 'COMPLETE'}
+          scanProgress={activeProgress}
+          state={activeChapter === 3 ? 'PENDING' : activeChapter === 4 ? 'SCANNING' : 'COMPLETE'}
         />
       )}
 
-      {/* Hydrodynamic Drift & Current Streamlines */}
       {state.showDriftPath && (
         <RouteTrail
           visible={state.showDriftPath}

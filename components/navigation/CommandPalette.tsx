@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/lib/state/useAppStore';
 import { 
   LucideSearch, 
   LucideMap, 
@@ -17,14 +18,18 @@ import {
   LucideFileText,
   LucideSatellite,
   LucideCompass,
-  LucideCrosshair
+  LucideCrosshair,
+  LucideMaximize,
+  LucidePlay,
+  LucideRefreshCw,
+  LucideTarget
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface CommandItem {
   id: string;
   label: string;
-  category: 'Navigation' | 'Vessels' | 'Chapters' | 'Tactical';
+  category: 'Navigation' | 'Vessels' | 'Chapters' | 'Tactical' | 'Workflow';
   icon: any;
   shortcut?: string;
   action: string;
@@ -33,32 +38,36 @@ interface CommandItem {
 
 const COMMANDS: CommandItem[] = [
   // Primary Navigation
-  { id: 'home', label: 'Home — Operational Narrative', category: 'Navigation', icon: LucideHome, shortcut: 'G H', action: '/' },
-  { id: 'investigate', label: 'Investigation Map — Tactical GIS', category: 'Navigation', icon: LucideMap, shortcut: 'G I', action: '/investigate' },
+  { id: 'home', label: 'Workstation — Interactive Investigation', category: 'Navigation', icon: LucideHome, shortcut: 'G H', action: '/' },
   { id: 'incident', label: 'Incident ST-2026-0042 — Legal Dossier', category: 'Navigation', icon: LucideShield, shortcut: 'O I', action: '/incident/ST-2026-0042' },
   { id: 'response', label: 'Response Planning — Tier Matrix', category: 'Navigation', icon: LucideCrosshair, shortcut: 'G R', action: '/response' },
   { id: 'analytics', label: 'Regional Analytics — Arabian Sea', category: 'Navigation', icon: LucideBarChart, shortcut: 'G A', action: '/analytics' },
   { id: 'about', label: 'System Architecture — SIH26143', category: 'Navigation', icon: LucideInfo, shortcut: 'G S', action: '/about' },
 
   // Candidate Vessels
-  { id: 'vessel-a', label: 'MT Horizon Trader (Primary Suspect · 94%)', category: 'Vessels', icon: LucideShip, shortcut: 'V A', action: '/vessel/horizon-trader', detail: 'IMO 9234567 · Crude Tanker · AIS Gap 14.2h' },
-  { id: 'vessel-b', label: 'MV Stellar Pioneer (Candidate B · Excluded)', category: 'Vessels', icon: LucideShip, shortcut: 'V B', action: '/vessel/stellar-pioneer', detail: 'IMO 9481234 · Bulk Carrier · Unbroken AIS' },
-  { id: 'vessel-c', label: 'MT Pacific Crown (Candidate C · Excluded)', category: 'Vessels', icon: LucideShip, shortcut: 'V C', action: '/vessel/pacific-crown', detail: 'IMO 9315678 · Chemical Tanker · Upwind' },
+  { id: 'vessel-a', label: 'MT OCEANIC PIONEER (Primary Suspect · 94%)', category: 'Vessels', icon: LucideShip, shortcut: 'V A', action: 'select_vessel:V-001-ALPHA', detail: 'MMSI 419000123 · Crude Tanker · AIS Gap 14.2h' },
+  { id: 'vessel-b', label: 'MV GLOBAL TRADER (Candidate B · 32%)', category: 'Vessels', icon: LucideShip, shortcut: 'V B', action: 'select_vessel:V-002-BRAVO', detail: 'MMSI 419000456 · Bulk Carrier · No discharge' },
+  { id: 'vessel-c', label: 'FV SEA HORSE (Candidate C · 12%)', category: 'Vessels', icon: LucideShip, shortcut: 'V C', action: 'select_vessel:V-003-CHARLIE', detail: 'MMSI 419000789 · Fishing Vessel · Size mismatch' },
 
-  // Narrative Chapters
+  // Workflow Steps
+  { id: 'step-1', label: 'Step 01: Observe', category: 'Workflow', icon: LucideSatellite, action: 'workflow:1' },
+  { id: 'step-2', label: 'Step 02: Detect', category: 'Workflow', icon: LucideLayers, action: 'workflow:2' },
+  { id: 'step-3', label: 'Step 03: Validate', category: 'Workflow', icon: LucideTarget, action: 'workflow:3' },
+  { id: 'step-5', label: 'Step 05: Trace', category: 'Workflow', icon: LucideRotateCcw, action: 'workflow:5' },
+  { id: 'step-6', label: 'Step 06: Correlate', category: 'Workflow', icon: LucideCompass, action: 'workflow:6' },
+  { id: 'step-7', label: 'Step 07: Attribute', category: 'Workflow', icon: LucideCrosshair, action: 'workflow:7' },
+
+  // Narrative Chapters (Presentation Mode)
   { id: 'ch-1', label: 'Chapter 01: The Ocean (Arabian Sea Watch)', category: 'Chapters', icon: LucideCompass, shortcut: 'C 1', action: 'chapter:1' },
   { id: 'ch-3', label: 'Chapter 03: Satellite Arrival (Sentinel-1 C-SAR)', category: 'Chapters', icon: LucideSatellite, shortcut: 'C 3', action: 'chapter:3' },
-  { id: 'ch-4', label: 'Chapter 04: SAR Analysis (VV/VH Roughness)', category: 'Chapters', icon: LucideLayers, shortcut: 'C 4', action: 'chapter:4' },
-  { id: 'ch-6', label: 'Chapter 06: Bonn Agreement Characterization', category: 'Chapters', icon: LucideFileText, shortcut: 'C 6', action: 'chapter:6' },
   { id: 'ch-7', label: 'Chapter 07: Rewind the Ocean (Lagrangian Backtrack)', category: 'Chapters', icon: LucideRotateCcw, shortcut: 'C 7', action: 'chapter:7' },
-  { id: 'ch-8', label: 'Chapter 08: Origin Probability Zone', category: 'Chapters', icon: LucideCrosshair, shortcut: 'C 8', action: 'chapter:8' },
   { id: 'ch-11', label: 'Chapter 11: AIS Reconstruction & Dark Vessel Filter', category: 'Chapters', icon: LucideShip, shortcut: 'C 11', action: 'chapter:11' },
   { id: 'ch-13', label: 'Chapter 13: Why This Vessel? (Culpability Analysis)', category: 'Chapters', icon: LucideShield, shortcut: 'C 13', action: 'chapter:13' },
-  { id: 'ch-15', label: 'Chapter 15: Admissible Evidence Graph', category: 'Chapters', icon: LucideFileText, shortcut: 'C 15', action: 'chapter:15' },
-  { id: 'ch-16', label: 'Chapter 16: Automated Response Planning', category: 'Chapters', icon: LucideCrosshair, shortcut: 'C 16', action: 'chapter:16' },
 
   // Tactical Controls
-  { id: 'demo-toggle', label: 'Toggle Demo Simulation Mode', category: 'Tactical', icon: LucideSettings, shortcut: 'T D', action: 'toggle_demo' },
+  { id: 'focus-mode', label: 'Toggle Focus Mode', category: 'Tactical', icon: LucideMaximize, shortcut: 'F', action: 'toggle_focus' },
+  { id: 'present-mode', label: 'Toggle Presentation Mode', category: 'Tactical', icon: LucidePlay, shortcut: 'P', action: 'toggle_presentation' },
+  { id: 'reset-demo', label: 'Reset Demo to Initial State', category: 'Tactical', icon: LucideRefreshCw, shortcut: 'T R', action: 'reset_demo' },
 ];
 
 export default function CommandPalette() {
@@ -128,18 +137,38 @@ export default function CommandPalette() {
 
   const handleSelect = (command: CommandItem) => {
     setIsOpen(false);
+    const store = useAppStore.getState();
+    
     if (command.action.startsWith('chapter:')) {
       const chNum = parseInt(command.action.replace('chapter:', ''), 10);
-      if (window.location.pathname === '/') {
+      // Activate presentation mode and scroll to chapter
+      store.setPresentationMode(true);
+      router.push('/');
+      setTimeout(() => {
         const target = (chNum - 1) * window.innerHeight;
         window.scrollTo({ top: target, behavior: 'smooth' });
-      } else {
-        router.push(`/?chapter=${chNum}`);
-      }
+      }, 100);
+    } else if (command.action.startsWith('workflow:')) {
+      const step = parseInt(command.action.replace('workflow:', ''), 10);
+      store.setWorkflowStep(step);
+      store.setPresentationMode(false);
+      router.push('/');
+    } else if (command.action.startsWith('select_vessel:')) {
+      const vesselId = command.action.replace('select_vessel:', '');
+      store.setSelectedVessel(vesselId);
+      store.setWorkflowStep(7); // Jump to Attribution step
+      store.setPresentationMode(false);
+      router.push('/');
+    } else if (command.action === 'toggle_focus') {
+      store.setFocusMode(!store.focusMode);
+    } else if (command.action === 'toggle_presentation') {
+      store.setPresentationMode(!store.presentationMode);
+      if (!store.presentationMode) router.push('/');
+    } else if (command.action === 'reset_demo') {
+      store.resetDemo();
+      router.push('/');
     } else if (command.action.startsWith('/')) {
       router.push(command.action);
-    } else if (command.action === 'toggle_demo') {
-      console.log('[SpillTrace AI] Toggled demo simulation state');
     }
   };
 

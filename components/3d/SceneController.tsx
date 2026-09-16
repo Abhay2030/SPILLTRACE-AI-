@@ -5,6 +5,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Earth from './Earth';
 import Ocean from './Ocean';
+import Clouds from './Clouds';
 import Atmosphere from './Atmosphere';
 import Stars from './Stars';
 import Satellite from './Satellite';
@@ -63,7 +64,8 @@ function getSceneState(chapter: number, progress: number) {
     spillProgress: chapter === 7 ? 1 - progress : chapter >= 4 ? Math.min(1, Math.max(0.1, (chapter - 4) * 0.3 + progress * 0.2)) : 0,
     showProbabilityField: chapter >= 8 && chapter <= 15,
     showDriftPath: chapter >= 9 && chapter <= 14,
-    earthRotation: chapter <= 2 ? 0.0008 : 0.0002,
+    // Smooth planetary rotation during global overview chapters; stabilize on Arabian Sea coordinate frame during investigation
+    earthRotation: chapter <= 2 || chapter >= 18 ? 0.0006 : 0.0,
   };
 }
 
@@ -126,7 +128,14 @@ export default function SceneController() {
         {state.showEarth && <Earth rotationSpeed={state.earthRotation} />}
         {state.showAtmosphere && <Atmosphere />}
         {state.showOcean && <Ocean opacity={chapter === 2 ? progress : 1} />}
-        {state.showSpill && <SpillShape visible={state.showSpill} progress={state.spillProgress} />}
+        {state.showEarth && <Clouds />}
+        {state.showSpill && (
+          <SpillShape
+            visible={state.showSpill}
+            progress={state.spillProgress}
+            rewindProgress={chapter === 7 ? progress : 0}
+          />
+        )}
         {state.showProbabilityField && <ProbabilityField visible={state.showProbabilityField} intensity={0.8} />}
       </group>
 

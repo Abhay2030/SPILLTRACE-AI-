@@ -1,38 +1,44 @@
 'use client';
+
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { EARTH_RADIUS } from '@/lib/three/scene-config';
 
-const vertexShader = `
+const oceanSurfaceVertexShader = `
   uniform float uTime;
+  varying vec3 vNormal;
   varying vec2 vUv;
-  varying float vElevation;
+  varying vec3 vPosition;
 
   void main() {
-    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-    float elevation = sin(modelPosition.x * 3.0 + uTime * 0.5) * 0.05
-                    + sin(modelPosition.z * 2.0 + uTime * 0.3) * 0.08
-                    + sin(modelPosition.x * 5.0 + modelPosition.z * 4.0 + uTime * 0.7) * 0.02;
-    modelPosition.y += elevation;
-    vElevation = elevation;
+    vNormal = normalize(normalMatrix * normal);
     vUv = uv;
-    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+    
+    // Micro-wave elevation on spherical surface
+    float wave = sin(position.x * 30.0 + uTime * 1.5) * 0.0012
+               + cos(position.z * 25.0 + uTime * 1.2) * 0.0015
+               + sin(position.y * 35.0 + uTime * 2.0) * 0.0008;
+
+    vec3 newPosition = position + normal * wave;
+    vPosition = newPosition;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
   }
 `;
 
-const fragmentShader = `
-  uniform vec3 uOceanColor;
-  uniform vec3 uDeepColor;
+const oceanSurfaceFragmentShader = `
+  uniform float uTime;
   uniform float uOpacity;
-  varying float vElevation;
+  varying vec3 vNormal;
   varying vec2 vUv;
+  varying vec3 vPosition;
 
   void main() {
-    float mixFactor = (vElevation + 0.1) * 5.0;
-    vec3 color = mix(uDeepColor, uOceanColor, clamp(mixFactor, 0.0, 1.0));
-    float foam = smoothstep(0.06, 0.09, vElevation);
-    color = mix(color, vec3(0.9, 0.95, 1.0), foam * 0.3);
-    gl_FragColor = vec4(color, uOpacity);
+    // Specular Fresnel shimmer on micro waves
+    float fresnel = pow(1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0), 3.0);
+    vec3 waveShimmer = vec3(0.12, 0.58, 0.88) * (fresnel * 0.6);
+
+    gl_FragColor = vec4(waveShimmer, uOpacity * 0.45);
   }
 `;
 
@@ -46,20 +52,22 @@ export default function Ocean({ opacity = 1 }: { opacity?: number }) {
     }
   });
 
+  const radius = (typeof EARTH_RADIUS !== 'undefined' ? EARTH_RADIUS : 2) + 0.004;
+
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-      <planeGeometry args={[20, 20, 128, 128]} />
+    <mesh>
+      <sphereGeometry args={[radius, 64, 64]} />
       <shaderMaterial
         ref={materialRef}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
+        vertexShader={oceanSurfaceVertexShader}
+        fragmentShader={oceanSurfaceFragmentShader}
         uniforms={{
           uTime: { value: 0 },
-          uOceanColor: { value: new THREE.Color('#0369A1') },
-          uDeepColor: { value: new THREE.Color('#075985') },
           uOpacity: { value: opacity }
         }}
         transparent={true}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
       />
     </mesh>
   );

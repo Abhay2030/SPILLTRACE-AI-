@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -10,19 +11,54 @@ import {
   LucideShield, 
   LucideInfo, 
   LucideSettings,
-  LucideHome
+  LucideHome,
+  LucideLayers,
+  LucideRotateCcw,
+  LucideFileText,
+  LucideSatellite,
+  LucideCompass,
+  LucideCrosshair
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 
-const COMMANDS = [
-  { id: 'home', label: 'Home', icon: LucideHome, shortcut: 'G H', action: '/' },
-  { id: 'investigate', label: 'Start Investigation', icon: LucideMap, shortcut: 'G I', action: '/investigate' },
-  { id: 'incident', label: 'Open Incident ST-2026-0042', icon: LucideShield, shortcut: 'O I', action: '/incident/ST-2026-0042' },
-  { id: 'vessel', label: 'Find Vessel', icon: LucideShip, shortcut: 'F V', action: '/vessel/horizon-trader' },
-  { id: 'analytics', label: 'View Analytics', icon: LucideBarChart, shortcut: 'G A', action: '/analytics' },
-  { id: 'response', label: 'Response Planning', icon: LucideMap, shortcut: 'G R', action: '/response' },
-  { id: 'about', label: 'About System', icon: LucideInfo, shortcut: 'G S', action: '/about' },
-  { id: 'demo', label: 'Toggle Demo Mode', icon: LucideSettings, shortcut: 'T D', action: 'toggle_demo' },
+interface CommandItem {
+  id: string;
+  label: string;
+  category: 'Navigation' | 'Vessels' | 'Chapters' | 'Tactical';
+  icon: any;
+  shortcut?: string;
+  action: string;
+  detail?: string;
+}
+
+const COMMANDS: CommandItem[] = [
+  // Primary Navigation
+  { id: 'home', label: 'Home — Operational Narrative', category: 'Navigation', icon: LucideHome, shortcut: 'G H', action: '/' },
+  { id: 'investigate', label: 'Investigation Map — Tactical GIS', category: 'Navigation', icon: LucideMap, shortcut: 'G I', action: '/investigate' },
+  { id: 'incident', label: 'Incident ST-2026-0042 — Legal Dossier', category: 'Navigation', icon: LucideShield, shortcut: 'O I', action: '/incident/ST-2026-0042' },
+  { id: 'response', label: 'Response Planning — Tier Matrix', category: 'Navigation', icon: LucideCrosshair, shortcut: 'G R', action: '/response' },
+  { id: 'analytics', label: 'Regional Analytics — Arabian Sea', category: 'Navigation', icon: LucideBarChart, shortcut: 'G A', action: '/analytics' },
+  { id: 'about', label: 'System Architecture — SIH26143', category: 'Navigation', icon: LucideInfo, shortcut: 'G S', action: '/about' },
+
+  // Candidate Vessels
+  { id: 'vessel-a', label: 'MT Horizon Trader (Primary Suspect · 94%)', category: 'Vessels', icon: LucideShip, shortcut: 'V A', action: '/vessel/horizon-trader', detail: 'IMO 9234567 · Crude Tanker · AIS Gap 14.2h' },
+  { id: 'vessel-b', label: 'MV Stellar Pioneer (Candidate B · Excluded)', category: 'Vessels', icon: LucideShip, shortcut: 'V B', action: '/vessel/stellar-pioneer', detail: 'IMO 9481234 · Bulk Carrier · Unbroken AIS' },
+  { id: 'vessel-c', label: 'MT Pacific Crown (Candidate C · Excluded)', category: 'Vessels', icon: LucideShip, shortcut: 'V C', action: '/vessel/pacific-crown', detail: 'IMO 9315678 · Chemical Tanker · Upwind' },
+
+  // Narrative Chapters
+  { id: 'ch-1', label: 'Chapter 01: The Ocean (Arabian Sea Watch)', category: 'Chapters', icon: LucideCompass, shortcut: 'C 1', action: 'chapter:1' },
+  { id: 'ch-3', label: 'Chapter 03: Satellite Arrival (Sentinel-1 C-SAR)', category: 'Chapters', icon: LucideSatellite, shortcut: 'C 3', action: 'chapter:3' },
+  { id: 'ch-4', label: 'Chapter 04: SAR Analysis (VV/VH Roughness)', category: 'Chapters', icon: LucideLayers, shortcut: 'C 4', action: 'chapter:4' },
+  { id: 'ch-6', label: 'Chapter 06: Bonn Agreement Characterization', category: 'Chapters', icon: LucideFileText, shortcut: 'C 6', action: 'chapter:6' },
+  { id: 'ch-7', label: 'Chapter 07: Rewind the Ocean (Lagrangian Backtrack)', category: 'Chapters', icon: LucideRotateCcw, shortcut: 'C 7', action: 'chapter:7' },
+  { id: 'ch-8', label: 'Chapter 08: Origin Probability Zone', category: 'Chapters', icon: LucideCrosshair, shortcut: 'C 8', action: 'chapter:8' },
+  { id: 'ch-11', label: 'Chapter 11: AIS Reconstruction & Dark Vessel Filter', category: 'Chapters', icon: LucideShip, shortcut: 'C 11', action: 'chapter:11' },
+  { id: 'ch-13', label: 'Chapter 13: Why This Vessel? (Culpability Analysis)', category: 'Chapters', icon: LucideShield, shortcut: 'C 13', action: 'chapter:13' },
+  { id: 'ch-15', label: 'Chapter 15: Admissible Evidence Graph', category: 'Chapters', icon: LucideFileText, shortcut: 'C 15', action: 'chapter:15' },
+  { id: 'ch-16', label: 'Chapter 16: Automated Response Planning', category: 'Chapters', icon: LucideCrosshair, shortcut: 'C 16', action: 'chapter:16' },
+
+  // Tactical Controls
+  { id: 'demo-toggle', label: 'Toggle Demo Simulation Mode', category: 'Tactical', icon: LucideSettings, shortcut: 'T D', action: 'toggle_demo' },
 ];
 
 export default function CommandPalette() {
@@ -49,7 +85,9 @@ export default function CommandPalette() {
 
   // Filter commands
   const filteredCommands = COMMANDS.filter((command) =>
-    command.label.toLowerCase().includes(query.toLowerCase())
+    command.label.toLowerCase().includes(query.toLowerCase()) ||
+    command.category.toLowerCase().includes(query.toLowerCase()) ||
+    (command.detail && command.detail.toLowerCase().includes(query.toLowerCase()))
   );
 
   // Keyboard navigation
@@ -59,11 +97,11 @@ export default function CommandPalette() {
       
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredCommands.length));
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % filteredCommands.length);
+        setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % Math.max(1, filteredCommands.length));
       }
       if (e.key === 'Enter' && filteredCommands[selectedIndex]) {
         e.preventDefault();
@@ -88,12 +126,20 @@ export default function CommandPalette() {
     }
   }, [isOpen]);
 
-  const handleSelect = (command: typeof COMMANDS[0]) => {
+  const handleSelect = (command: CommandItem) => {
     setIsOpen(false);
-    if (command.action.startsWith('/')) {
+    if (command.action.startsWith('chapter:')) {
+      const chNum = parseInt(command.action.replace('chapter:', ''), 10);
+      if (window.location.pathname === '/') {
+        const target = (chNum - 1) * window.innerHeight;
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      } else {
+        router.push(`/?chapter=${chNum}`);
+      }
+    } else if (command.action.startsWith('/')) {
       router.push(command.action);
     } else if (command.action === 'toggle_demo') {
-      console.log('Toggled demo mode');
+      console.log('[SpillTrace AI] Toggled demo simulation state');
     }
   };
 
@@ -154,14 +200,26 @@ export default function CommandPalette() {
                             : "text-ink-secondary hover:bg-surface-subtle/50"
                         )}
                       >
-                        <div className="flex items-center">
-                          <Icon className={cn("w-4 h-4 mr-3", isSelected ? "text-ocean" : "text-ink-tertiary")} />
-                          <span className={cn("font-medium", isSelected ? "text-ocean" : "text-ink-primary")}>
-                            {command.label}
-                          </span>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Icon className={cn("w-4 h-4 shrink-0", isSelected ? "text-ocean" : "text-ink-tertiary")} />
+                          <div className="flex flex-col text-left truncate">
+                            <div className="flex items-center gap-2">
+                              <span className={cn("font-medium truncate", isSelected ? "text-ocean" : "text-ink-primary")}>
+                                {command.label}
+                              </span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 bg-surface border border-border rounded text-ink-tertiary shrink-0">
+                                {command.category}
+                              </span>
+                            </div>
+                            {command.detail && (
+                              <span className="text-[11px] font-mono text-ink-tertiary truncate">
+                                {command.detail}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         {command.shortcut && (
-                          <div className="flex gap-1">
+                          <div className="flex gap-1 shrink-0 ml-3">
                              {command.shortcut.split(' ').map(key => (
                                <span key={key} className="text-[10px] font-mono text-ink-tertiary bg-surface px-1.5 py-0.5 rounded border border-surface-subtle">
                                  {key}

@@ -47,6 +47,7 @@ export default function DemoController({ className }: DemoControllerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentChapter, setCurrentChapter] = useState(1);
   const [speed, setSpeed] = useState(1);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const scrollToChapter = useCallback((chapter: number) => {
     const target = (chapter - 1) * window.innerHeight;
@@ -69,6 +70,7 @@ export default function DemoController({ className }: DemoControllerProps) {
 
   const restart = useCallback(() => {
     setIsPlaying(false);
+    setElapsedSeconds(0);
     scrollToChapter(1);
   }, [scrollToChapter]);
 
@@ -78,6 +80,14 @@ export default function DemoController({ className }: DemoControllerProps) {
       if (prev === 1) return 2;
       return 0.5;
     });
+  }, []);
+
+  // Elapsed presentation timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   // Auto-advance when playing
@@ -94,7 +104,7 @@ export default function DemoController({ className }: DemoControllerProps) {
         scrollToChapter(nextChapter);
         return nextChapter;
       });
-    }, (8000 / speed));
+    }, 8000 / speed);
 
     return () => clearInterval(interval);
   }, [isPlaying, speed, scrollToChapter]);
@@ -113,10 +123,12 @@ export default function DemoController({ className }: DemoControllerProps) {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
 
       switch (e.key) {
         case ' ':
+        case 'p':
+        case 'P':
           e.preventDefault();
           isPlaying ? pause() : play();
           break;
@@ -128,7 +140,12 @@ export default function DemoController({ className }: DemoControllerProps) {
           e.preventDefault();
           previous();
           break;
+        case 'Escape':
+          e.preventDefault();
+          setIsOpen((prev) => !prev);
+          break;
         case 'r':
+        case 'R':
           if (!e.metaKey && !e.ctrlKey) {
             e.preventDefault();
             restart();
@@ -168,10 +185,17 @@ export default function DemoController({ className }: DemoControllerProps) {
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono uppercase tracking-widest text-ink-tertiary">
                     Presentation Control
                   </span>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-subtle text-ink-secondary text-[10px] font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-ocean animate-pulse" />
+                    <span>
+                      {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
+                      {String(elapsedSeconds % 60).padStart(2, '0')}
+                    </span>
+                  </div>
                   <button
                     onClick={cycleSpeed}
                     className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-subtle text-ink-secondary hover:bg-surface-muted transition-colors"
@@ -181,13 +205,28 @@ export default function DemoController({ className }: DemoControllerProps) {
                     <span className="text-[10px] font-mono">{speed}x</span>
                   </button>
                 </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-surface-subtle rounded-lg transition-colors"
-                  aria-label="Minimize controller"
-                >
-                  <ChevronDown className="w-4 h-4 text-ink-tertiary" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Quick Chapter Jump Dropdown */}
+                  <select
+                    value={currentChapter}
+                    onChange={(e) => scrollToChapter(Number(e.target.value))}
+                    className="text-[10px] font-mono bg-surface-subtle border border-border rounded px-2 py-0.5 text-ink-secondary outline-none cursor-pointer"
+                    aria-label="Jump to chapter"
+                  >
+                    {CHAPTER_LABELS.map((label, idx) => (
+                      <option key={idx} value={idx + 1}>
+                        CH {String(idx + 1).padStart(2, '0')}: {label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-1 hover:bg-surface-subtle rounded-lg transition-colors"
+                    aria-label="Minimize controller"
+                  >
+                    <ChevronDown className="w-4 h-4 text-ink-tertiary" />
+                  </button>
+                </div>
               </div>
 
               {/* Chapter info */}

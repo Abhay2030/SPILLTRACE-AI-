@@ -45,38 +45,36 @@ const earthFragmentShader = `
     vec3 lightDir = normalize(sunDirection);
     float NdotL = dot(vWorldNormal, lightDir);
     
-    // Soft twilight transition threshold between day and night
-    float dayFactor = smoothstep(-0.15, 0.25, NdotL);
-    float twilight = smoothstep(-0.2, 0.0, NdotL) * (1.0 - smoothstep(0.0, 0.25, NdotL));
+    // Physically authentic twilight transition along the solar terminator
+    float dayFactor = smoothstep(-0.08, 0.15, NdotL);
+    float twilight = exp(-pow((NdotL - 0.02) / 0.10, 2.0));
 
-    // 3. Specular Ocean Glint (Sun reflection on water)
+    // 3. Specular Ocean Sun Glint (Directional reflection on water)
     vec3 viewDir = normalize(cameraPosition - vPosition);
     vec3 halfVector = normalize(lightDir + viewDir);
     float NdotH = max(dot(vWorldNormal, halfVector), 0.0);
-    float specular = pow(NdotH, 48.0) * specMask * dayFactor * 0.85;
+    // Warm solar glint with sharp falloff only over oceanic bodies
+    vec3 sunGlint = vec3(1.0, 0.95, 0.88) * pow(NdotH, 64.0) * specMask * max(0.0, NdotL) * 1.1;
 
-    // 4. Subtle Nautical Coordinate Graticule Lines (10-deg intervals)
-    float latGrid = step(0.965, fract(vUv.y * 18.0));
-    float lonGrid = step(0.965, fract(vUv.x * 36.0));
-    float graticule = max(latGrid, lonGrid) * 0.08;
-    vec3 graticuleColor = vec3(0.38, 0.74, 0.96);
+    // 4. Compose Day and Night
+    float diffuse = clamp(NdotL, 0.0, 1.0) * 0.82 + 0.18; // Soft ambient bounce
+    vec3 surfaceDay = (dayColor.rgb * diffuse) + sunGlint;
 
-    // 5. Compose Day, Night, Specular, and Twilight
-    vec3 surfaceDay = dayColor.rgb + vec3(specular) + (graticuleColor * graticule);
-    
-    // Twilight warm atmospheric rim
-    vec3 twilightColor = vec3(0.85, 0.45, 0.2) * twilight * 0.35;
+    // Warm atmospheric twilight reddening along terminator line
+    vec3 twilightColor = vec3(0.92, 0.44, 0.16) * twilight * 0.38;
 
-    // Night side city lights
-    vec3 surfaceNight = nightColor.rgb * 1.8;
+    // Night side terrestrial city lights (strictly masked to land masses)
+    vec3 surfaceNight = nightColor.rgb * 1.6;
 
     vec3 finalColor = mix(surfaceNight, surfaceDay, dayFactor) + twilightColor;
 
-    // 6. Subtle Rayleigh Atmospheric Fresnel Rim Glow
-    float fresnel = pow(1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0), 3.0);
-    vec3 atmosphereGlow = vec3(0.18, 0.65, 0.95) * fresnel * 0.45;
+    // 5. Authentic Rayleigh Atmospheric Limb (Illuminated only on sunlit horizon)
+    float viewAngle = max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+    float limbFresnel = pow(1.0 - viewAngle, 3.2);
+    float sunLitLimb = clamp(NdotL + 0.15, 0.0, 1.0);
+    vec3 atmosphereLimb = vec3(0.16, 0.62, 0.96) * limbFresnel * sunLitLimb * 0.45;
 
-    gl_FragColor = vec4(finalColor + atmosphereGlow, 1.0);
+    gl_FragColor = vec4(finalColor + atmosphereLimb, 1.0);
   }
 `;
 

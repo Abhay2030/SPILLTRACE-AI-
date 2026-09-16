@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { EARTH_RADIUS } from '@/lib/three/scene-config';
@@ -8,20 +8,22 @@ import { EARTH_RADIUS } from '@/lib/three/scene-config';
 const oceanSurfaceVertexShader = `
   uniform float uTime;
   varying vec3 vNormal;
+  varying vec3 vWorldNormal;
   varying vec2 vUv;
   varying vec3 vPosition;
 
   void main() {
     vNormal = normalize(normalMatrix * normal);
+    vWorldNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
     vUv = uv;
     
-    // Micro-wave elevation on spherical surface
-    float wave = sin(position.x * 30.0 + uTime * 1.5) * 0.0012
-               + cos(position.z * 25.0 + uTime * 1.2) * 0.0015
-               + sin(position.y * 35.0 + uTime * 2.0) * 0.0008;
+    // Directional monsoon swells along Arabian Sea current vector (~140° heading)
+    float wave1 = sin((position.x * 24.0 + position.z * 18.0) - uTime * 1.2) * 0.0009;
+    float wave2 = cos((position.x * 40.0 - position.y * 22.0) + uTime * 1.8) * 0.0006;
+    float wave = wave1 + wave2;
 
     vec3 newPosition = position + normal * wave;
-    vPosition = newPosition;
+    vPosition = (modelMatrix * vec4(newPosition, 1.0)).xyz;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
   }
 `;
@@ -29,21 +31,38 @@ const oceanSurfaceVertexShader = `
 const oceanSurfaceFragmentShader = `
   uniform float uTime;
   uniform float uOpacity;
+  uniform vec3 uSunDirection;
   varying vec3 vNormal;
+  varying vec3 vWorldNormal;
   varying vec2 vUv;
   varying vec3 vPosition;
 
   void main() {
-    // Specular Fresnel shimmer on micro waves
-    float fresnel = pow(1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0), 3.0);
-    vec3 waveShimmer = vec3(0.12, 0.58, 0.88) * (fresnel * 0.6);
+    // Ocean specular sheen illuminated by directional sunlight
+    vec3 lightDir = normalize(uSunDirection);
+    float NdotL = max(dot(vWorldNormal, lightDir), 0.0);
 
-    gl_FragColor = vec4(waveShimmer, uOpacity * 0.45);
+    vec3 viewDir = normalize(cameraPosition - vPosition);
+    float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 3.5);
+    
+    // Micro-facet caustic highlights
+    vec3 waveGlitter = vec3(0.12, 0.52, 0.85) * (fresnel * 0.45) * (NdotL * 0.8 + 0.2);
+
+    gl_FragColor = vec4(waveGlitter, uOpacity * 0.35 * (NdotL * 0.8 + 0.2));
   }
 `;
 
 export default function Ocean({ opacity = 1 }: { opacity?: number }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uOpacity: { value: opacity },
+      uSunDirection: { value: new THREE.Vector3(5.0, 3.0, 4.0).normalize() },
+    }),
+    []
+  );
 
   useFrame(({ clock }) => {
     if (materialRef.current) {
@@ -52,7 +71,7 @@ export default function Ocean({ opacity = 1 }: { opacity?: number }) {
     }
   });
 
-  const radius = (typeof EARTH_RADIUS !== 'undefined' ? EARTH_RADIUS : 2) + 0.004;
+  const radius = (typeof EARTH_RADIUS !== 'undefined' ? EARTH_RADIUS : 2) + 0.003;
 
   return (
     <mesh>
@@ -61,10 +80,7 @@ export default function Ocean({ opacity = 1 }: { opacity?: number }) {
         ref={materialRef}
         vertexShader={oceanSurfaceVertexShader}
         fragmentShader={oceanSurfaceFragmentShader}
-        uniforms={{
-          uTime: { value: 0 },
-          uOpacity: { value: opacity }
-        }}
+        uniforms={uniforms}
         transparent={true}
         depthWrite={false}
         blending={THREE.AdditiveBlending}

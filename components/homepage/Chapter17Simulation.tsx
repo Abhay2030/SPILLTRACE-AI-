@@ -20,6 +20,9 @@ interface Scenario {
   description: string;
   primaryMetric: string;
   recoveryPct: number;
+  evaporatedPct: number;
+  dispersedPct: number;
+  residualPct: number;
   assetsRequired: string;
   timeToDeploy: string;
   residualRisk: 'LOW' | 'MEDIUM' | 'HIGH';
@@ -31,45 +34,54 @@ interface Scenario {
 const SCENARIOS: Scenario[] = [
   {
     id: 'contain_east',
-    title: 'CONTAIN EAST',
-    subtitle: 'Eastern Deflection Booming',
-    description: 'Deploys 2,400m offshore heavy boom curtains along the eastern flank to deflect slick away from the continental shelf and fishing grounds.',
-    primaryMetric: '78% Total Containment',
+    title: 'OFFSHORE DEFLECTION & SKIMMING',
+    subtitle: 'Established Physical Containment',
+    description: 'Deploys 2,400m heavy offshore boom curtains towed by ICGS Vikram and commercial tugs to corral the slick into Skimmer Nirmala weir skimming pockets.',
+    primaryMetric: '78% Mechanical Recovery',
     recoveryPct: 78,
-    assetsRequired: '4 Response Units (2 OPVs + 2 Tugs)',
-    timeToDeploy: '2.5 Hours to Station',
+    evaporatedPct: 32,
+    dispersedPct: 11,
+    residualPct: 11,
+    assetsRequired: '4 Units (1 OPV + 1 Skimmer + 2 Tugs)',
+    timeToDeploy: '3.2 Hours to Station',
     residualRisk: 'MEDIUM',
     residualVariant: 'warning',
     costEstimate: '₹42 Lakhs ($50,000)',
-    tacticalFocus: 'Deflection into offshore deep-water recovery zone',
+    tacticalFocus: 'Deflection into offshore deep-water recovery zone avoiding shelf shoaling',
   },
   {
     id: 'protect_coast',
-    title: 'PROTECT COAST',
-    subtitle: 'Ecological Sanctuary Barrier',
-    description: 'Establishes a double-layered physical containment barrier 40 km offshore from Netrani Island Marine Sanctuary and Karwar nursery banks.',
-    primaryMetric: '95% Coastal Protection',
-    recoveryPct: 95,
-    assetsRequired: '6 Units (3 Coast Guard + 3 Skimmers)',
-    timeToDeploy: '3.0 Hours to Station',
+    title: 'NETRANI ECO-SANCTUARY SHIELD',
+    subtitle: 'Double Barrier + 2026 Magnetic Sorbents',
+    description: 'Deploys double-layered inflatable curtain booms coupled with 2026 superhydrophobic magnetic sorbent arrays 35 km seaward of Netrani Island marine biodiversity hotspot.',
+    primaryMetric: '96% Sanctuary Protection',
+    recoveryPct: 88,
+    evaporatedPct: 32,
+    dispersedPct: 8,
+    residualPct: 4,
+    assetsRequired: '6 Units (2 ICG Fast Cutters + 2 Sorbent Barges + 2 USVs)',
+    timeToDeploy: '2.5 Hours to Station',
     residualRisk: 'LOW',
     residualVariant: 'success',
     costEstimate: '₹68 Lakhs ($82,000)',
-    tacticalFocus: 'Strict isolation of marine biodiversity receptors',
+    tacticalFocus: 'Strict physical and oleophilic isolation of coral reefs and fish nursery banks',
   },
   {
     id: 'intercept_drift',
-    title: 'INTERCEPT DRIFT',
-    subtitle: 'High-Speed Pelagic Skimming',
-    description: 'Direct open-ocean interception deploying weir skimmers into the heaviest Bonn Code 4/5 core slick along the 142° drift vector.',
-    primaryMetric: '62% Mechanical Recovery',
-    recoveryPct: 62,
-    assetsRequired: '3 Specialized Skimmer Vessels',
-    timeToDeploy: '4.5 Hours to Station',
-    residualRisk: 'HIGH',
-    residualVariant: 'critical',
-    costEstimate: '₹55 Lakhs ($66,000)',
-    tacticalFocus: 'Direct physical removal of concentrated emulsion',
+    title: 'AI PREDICTIVE SWARM INTERCEPTION',
+    subtitle: 'Adaptive Centroid USV Intercept',
+    description: 'SpillTrace calculates the optimal hydrodynamic intercept point (+4h forward Lagrangian forecast), vectoring autonomous USVs and photothermal sorbents before heavy emulsification begins.',
+    primaryMetric: '92% Early-Stage Intercept',
+    recoveryPct: 92,
+    evaporatedPct: 34,
+    dispersedPct: 5,
+    residualPct: 3,
+    assetsRequired: '8 Autonomous Units (6 USVs + 2 Surveillance UAVs)',
+    timeToDeploy: '1.2 Hours to Intercept',
+    residualRisk: 'LOW',
+    residualVariant: 'success',
+    costEstimate: '₹34 Lakhs ($41,000)',
+    tacticalFocus: 'Pre-positioning at high-probability density core prior to chocolate mousse formation',
   },
 ];
 
@@ -225,11 +237,34 @@ export function Chapter17Simulation() {
                   <StatusBadge variant={currentScenario.residualVariant} status={currentScenario.residualRisk} />
                 </div>
               </div>
+
+              {/* Hydrodynamic Weathering Mass Balance Profile */}
+              <div className="p-3 bg-surface rounded-lg border border-ink-tertiary/15 font-mono text-[11px] space-y-1.5">
+                <span className="text-[10px] text-ink-tertiary uppercase font-bold block">
+                  PHYSICAL WEATHERING MASS BALANCE
+                </span>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>Evaporative Volatilization (ADIOS2):</span>
+                  <strong className="text-ink-primary">{currentScenario.evaporatedPct}%</strong>
+                </div>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>Natural Oceanic Dispersion:</span>
+                  <strong className="text-ink-primary">{currentScenario.dispersedPct}%</strong>
+                </div>
+                <div className="flex justify-between text-ink-secondary">
+                  <span>Residual Slick Emulsion:</span>
+                  <strong className="text-caution">{currentScenario.residualPct}%</strong>
+                </div>
+              </div>
+
+              <div className="text-[10px] font-mono text-ink-tertiary pt-1 text-center">
+                DEMO MODE · SIMULATED METOCEAN MASS BALANCE
+              </div>
             </div>
 
             <button
               onClick={() => window.location.href = '/response'}
-              className="w-full py-3 bg-ink-primary hover:bg-ink-primary/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-colors flex items-center justify-center gap-2 mt-4"
+              className="w-full py-3 bg-ocean hover:bg-ocean/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-colors flex items-center justify-center gap-2 mt-4"
             >
               EXECUTE SIMULATED STRATEGY <ArrowRight className="w-4 h-4" />
             </button>

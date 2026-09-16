@@ -1,5 +1,5 @@
 export const EARTH_RADIUS = 2;
-export const ATMOSPHERE_RADIUS = 2.15;
+export const ATMOSPHERE_RADIUS = 2.048;
 export const CAMERA_INITIAL_POSITION = [0, 0, 8] as [number, number, number];
 export const OCEAN_COLOR = '#0369A1';
 export const OCEAN_DEEP_COLOR = '#075985';

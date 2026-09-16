@@ -105,6 +105,61 @@ export function Chapter19System() {
           </p>
         </div>
 
+        {/* Closed-Loop Intelligence Cycle Diagram Banner */}
+        <div className="p-6 bg-surface rounded-2xl border border-ocean/30 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ink-tertiary/15 pb-3">
+            <span className="font-mono text-xs font-bold text-ocean uppercase tracking-wider flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-ocean animate-ping" />
+              CLOSED-LOOP OPERATIONAL INTELLIGENCE CYCLE
+            </span>
+            <span className="font-mono text-[11px] text-ink-tertiary">
+              Full Feedback Iteration: 12h to 24h Orbit Cycle
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-1">
+            <div className="p-3 bg-surface-subtle rounded-xl border border-ink-tertiary/15 space-y-1">
+              <span className="font-mono text-[10px] text-ink-tertiary uppercase font-bold block">
+                01 DETECTION
+              </span>
+              <h5 className="font-display text-xs font-bold text-ink-primary">SAR Ingestion</h5>
+              <p className="text-[11px] font-body text-ink-secondary">Sentinel-1 C-SAR dampening delineation</p>
+            </div>
+
+            <div className="p-3 bg-surface-subtle rounded-xl border border-ink-tertiary/15 space-y-1">
+              <span className="font-mono text-[10px] text-ink-tertiary uppercase font-bold block">
+                02 ATTRIBUTION
+              </span>
+              <h5 className="font-display text-xs font-bold text-ink-primary">AIS Correlation</h5>
+              <p className="text-[11px] font-body text-ink-secondary">Reverse drift trajectory candidate match</p>
+            </div>
+
+            <div className="p-3 bg-surface-subtle rounded-xl border border-ink-tertiary/15 space-y-1">
+              <span className="font-mono text-[10px] text-ink-tertiary uppercase font-bold block">
+                03 FORECASTING
+              </span>
+              <h5 className="font-display text-xs font-bold text-ink-primary">Forward Drift</h5>
+              <p className="text-[11px] font-body text-ink-secondary">72h receptor exposure & impact cone</p>
+            </div>
+
+            <div className="p-3 bg-surface-subtle rounded-xl border border-ink-tertiary/15 space-y-1">
+              <span className="font-mono text-[10px] text-ink-tertiary uppercase font-bold block">
+                04 INTERVENTION
+              </span>
+              <h5 className="font-display text-xs font-bold text-ink-primary">Asset Dispatch</h5>
+              <p className="text-[11px] font-body text-ink-secondary">AI-directed predictive interception</p>
+            </div>
+
+            <div className="p-3 bg-ocean/10 rounded-xl border border-ocean/30 space-y-1">
+              <span className="font-mono text-[10px] text-ocean uppercase font-bold block">
+                05 LOOP CLOSURE
+              </span>
+              <h5 className="font-display text-xs font-bold text-ocean">Satellite Re-Pass</h5>
+              <p className="text-[11px] font-body text-ink-secondary">Quantitative containment validation</p>
+            </div>
+          </div>
+        </div>
+
         {/* 6-Stage Architecture Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {SYSTEM_PIPELINE.map((stage) => {

@@ -210,28 +210,46 @@ export default function ShipFleet({
       dummy.lookAt(0, 0, 0);
       dummy.rotateX(Math.PI / 2);
       dummy.rotateZ(vessel.headingRad);
-      dummy.translateZ(vessel.wakeLength * 0.5 + 0.01); // Trailing behind vessel
+      dummy.translateZ(vessel.wakeLength * 0.5 + 0.008); // Trailing behind vessel
       dummy.updateMatrix();
       wakeMeshRef.current!.setMatrixAt(i, dummy.matrix);
+
+      // Per-instance color assignment
+      if (hullMeshRef.current) {
+        const hullColor = isHighlighted ? new THREE.Color('#F59E0B') : new THREE.Color(vessel.color);
+        hullMeshRef.current.setColorAt(i, hullColor);
+      }
+      if (bridgeMeshRef.current) {
+        const bridgeColor = isHighlighted
+          ? new THREE.Color('#FDE68A')
+          : vessel.vesselClass === 'cutter'
+          ? new THREE.Color('#FFFFFF')
+          : new THREE.Color('#94A3B8');
+        bridgeMeshRef.current.setColorAt(i, bridgeColor);
+      }
     });
 
     hullMeshRef.current.instanceMatrix.needsUpdate = true;
+    if (hullMeshRef.current.instanceColor) hullMeshRef.current.instanceColor.needsUpdate = true;
+
     bridgeMeshRef.current.instanceMatrix.needsUpdate = true;
+    if (bridgeMeshRef.current.instanceColor) bridgeMeshRef.current.instanceColor.needsUpdate = true;
+
     wakeMeshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <group>
-      {/* Primary Vessel Hulls (Instanced) */}
+      {/* Primary Vessel Hulls (Instanced with per-vessel color palette) */}
       <instancedMesh ref={hullMeshRef} args={[undefined, undefined, 247]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#0F172A" roughness={0.4} metalness={0.6} />
+        <meshStandardMaterial roughness={0.45} metalness={0.55} />
       </instancedMesh>
 
       {/* Vessel Bridge Structures (Instanced) */}
       <instancedMesh ref={bridgeMeshRef} args={[undefined, undefined, 247]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#38BDF8" roughness={0.2} metalness={0.8} />
+        <meshStandardMaterial roughness={0.3} metalness={0.6} />
       </instancedMesh>
 
       {/* Trailing Ocean Wakes with Natural Attenuation (Instanced) */}
@@ -240,7 +258,7 @@ export default function ShipFleet({
         <meshBasicMaterial
           color="#BAE6FD"
           transparent
-          opacity={0.32}
+          opacity={0.28}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}

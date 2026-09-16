@@ -112,10 +112,10 @@ export function Chapter01Ocean() {
         </div>
       </div>
 
-      {/* Hero Central Focus with Aerospace Glassmorphic Plate */}
-      <div className="max-w-4xl mx-auto text-center my-auto px-6 py-10 sm:px-12 sm:py-14 rounded-3xl bg-slate-950/75 backdrop-blur-2xl border border-cyan-500/30 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(6,182,212,0.2)] relative overflow-hidden">
+      {/* Hero Central Focus: Translucent Aerospace Glassmorphic Plate allowing 3D Earth to shine through */}
+      <div className="max-w-4xl mx-auto text-center my-auto px-6 py-8 sm:px-10 sm:py-10 rounded-3xl bg-slate-950/45 backdrop-blur-md border border-cyan-500/25 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),0_0_30px_rgba(6,182,212,0.15)] relative overflow-hidden">
         {/* Ambient Radial Illumination */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-cyan-500/25 blur-3xl pointer-events-none rounded-full" />
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-cyan-500/15 blur-3xl pointer-events-none rounded-full" />
 
         {/* Hackathon Badge */}
         <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6 shadow-[0_0_20px_rgba(6,182,212,0.4)]">

@@ -50,36 +50,47 @@ const cloudFragmentShader = `
   }
 
   void main() {
-    vec2 uvFlow = vUv * 8.0 + vec2(uTime * 0.005, 0.0);
+    // Eastward planetary cloud circulation + gentle tropical vortex swirl
+    vec2 uvFlow = vUv * 7.5 + vec2(uTime * 0.003, sin(vUv.x * 3.14) * 0.02);
     float cloudDensity = fbm(uvFlow);
 
-    // Soft cloud coverage mask (sparse wisps, not overcast)
-    float cloudAlpha = smoothstep(0.48, 0.72, cloudDensity) * 0.38;
+    // Natural cirrus and stratocumulus coverage (delicate wisps, not opaque blanket)
+    float rawAlpha = smoothstep(0.50, 0.74, cloudDensity);
 
-    // Atmospheric lighting: Sun illumination
-    float sunIntensity = max(dot(vNormal, normalize(uSunDirection)), 0.0);
-    vec3 cloudColor = mix(vec3(0.75, 0.82, 0.92), vec3(1.0, 1.0, 1.0), sunIntensity);
+    // Solar illumination and terminator tinting
+    vec3 lightDir = normalize(uSunDirection);
+    float NdotL = dot(vNormal, lightDir);
+    float dayFactor = smoothstep(-0.1, 0.25, NdotL);
+    float sunset = exp(-pow((NdotL - 0.03) / 0.12, 2.0));
 
-    gl_FragColor = vec4(cloudColor, cloudAlpha);
+    // Crisp white sunlit clouds with warm golden-amber rims at the terminator
+    vec3 dayCloud = vec3(0.96, 0.98, 1.0);
+    vec3 sunsetCloud = vec3(1.0, 0.58, 0.32);
+    vec3 cloudColor = mix(dayCloud, sunsetCloud, sunset * 0.7);
+
+    // Night side attenuation: allows city lights to remain visible from orbit
+    float finalAlpha = rawAlpha * mix(0.12, 0.35, dayFactor);
+
+    gl_FragColor = vec4(cloudColor, finalAlpha);
   }
 `;
 
-export default function Clouds({ radius = 2.025 }: { radius?: number }) {
+export default function Clouds({ radius = 2.018 }: { radius?: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uSunDirection: { value: new THREE.Vector3(5, 3, 4).normalize() },
+      uSunDirection: { value: new THREE.Vector3(5.0, 3.0, 4.0).normalize() },
     }),
     []
   );
 
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      // Gentle planetary cloud drift
-      meshRef.current.rotation.y += 0.00035;
+      // Authentic planetary zonal rotation
+      meshRef.current.rotation.y += 0.00018;
     }
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = clock.getElapsedTime();

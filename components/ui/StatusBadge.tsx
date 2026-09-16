@@ -1,9 +1,19 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+export type StatusBadgeVariant =
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'neutral'
+  | 'critical'
+  | 'verified'
+  | 'caution';
+
 export interface StatusBadgeProps {
   status: string;
-  variant?: 'info' | 'success' | 'warning' | 'danger' | 'neutral';
+  variant?: StatusBadgeVariant;
   size?: 'sm' | 'md';
   pulse?: boolean;
   className?: string;
@@ -16,11 +26,14 @@ export function StatusBadge({
   pulse = false,
   className
 }: StatusBadgeProps) {
-  const variants = {
+  const variants: Record<StatusBadgeVariant, string> = {
     info: 'bg-ocean/10 text-ocean',
     success: 'bg-verified/10 text-verified',
+    verified: 'bg-verified/10 text-verified',
     warning: 'bg-caution/10 text-caution',
+    caution: 'bg-caution/10 text-caution',
     danger: 'bg-critical/10 text-critical',
+    critical: 'bg-critical/10 text-critical',
     neutral: 'bg-gray-100 text-ink-secondary'
   };
 
@@ -29,11 +42,14 @@ export function StatusBadge({
     md: 'px-2.5 py-1 text-xs'
   };
 
-  const pulseColors = {
+  const pulseColors: Record<StatusBadgeVariant, string> = {
     info: 'bg-ocean',
     success: 'bg-verified',
+    verified: 'bg-verified',
     warning: 'bg-caution',
+    caution: 'bg-caution',
     danger: 'bg-critical',
+    critical: 'bg-critical',
     neutral: 'bg-ink-secondary'
   };
 
@@ -54,3 +70,5 @@ export function StatusBadge({
     </div>
   );
 }
+
+export default StatusBadge;

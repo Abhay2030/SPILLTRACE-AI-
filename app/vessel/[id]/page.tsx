@@ -3,86 +3,145 @@ import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfidenceBar } from '@/components/ui/ConfidenceBar';
 import { DEMO_VESSELS } from '@/data/demo-vessels';
-import { LucideCheckCircle, LucideAlertTriangle, LucideShip } from 'lucide-react';
+import { Ship, AlertTriangle, ShieldCheck, ArrowLeft, ExternalLink, Navigation, Compass, Radio } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Vessel Profile | SpillTrace AI',
+  title: 'Vessel Forensic Profile | SpillTrace AI',
 };
 
-export default async function VesselPage({ params }: { params: { id: string } }) {
-  const id = (await params).id;
-  const vessel = DEMO_VESSELS[0]; // Mock for now
+export default async function VesselPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
+
+  // Lookup vessel by ID or slug
+  const vessel =
+    DEMO_VESSELS.find((v: any) => v.id === id || v.id.toLowerCase().includes(id.toLowerCase())) ||
+    DEMO_VESSELS[0];
+
+  const isPrimarySuspect = vessel.id === 'VESSEL-A-001';
 
   return (
-    <div className="min-h-screen bg-surface pt-20 pb-12 px-6 lg:px-12 max-w-7xl mx-auto">
-      <DataModeIndicator mode="DEMO" />
-      
-      <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4 border-b border-surface-subtle pb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-h2 font-display text-ink-primary">{vessel.name}</h1>
-            <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-surface-subtle text-ink-secondary border border-surface-subtle">
-              {vessel.type}
-            </span>
+    <div className="min-h-screen bg-surface pt-24 pb-16 px-6 lg:px-12 max-w-7xl mx-auto space-y-8">
+      {/* Top Breadcrumb & Data Mode */}
+      <div className="flex items-center justify-between border-b border-ink-tertiary/15 pb-4">
+        <Link
+          href="/investigate"
+          className="flex items-center gap-2 font-mono text-xs text-ink-secondary hover:text-ink-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> BACK TO INVESTIGATION WORKSTATION
+        </Link>
+        <DataModeIndicator mode="DEMO" />
+      </div>
+
+      {/* Header Profile Title */}
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-ink-primary">
+              {vessel.name}
+            </h1>
+            <StatusBadge
+              variant={isPrimarySuspect ? 'critical' : 'neutral'}
+              status={isPrimarySuspect ? 'PRIMARY SUSPECT' : 'EXCLUDED / WATCH'}
+            />
           </div>
-          <p className="text-ink-secondary flex items-center gap-2 font-mono text-sm">
-            <span>IMO: {vessel.imo}</span>
+
+          <p className="text-ink-secondary flex flex-wrap items-center gap-3 font-mono text-xs">
+            <span>IMO: <strong>{vessel.imo}</strong></span>
             <span>·</span>
-            <span>MMSI: {vessel.mmsi}</span>
+            <span>MMSI: <strong>{vessel.mmsi}</strong></span>
             <span>·</span>
-            <span>Flag: {vessel.flag}</span>
+            <span>Flag: <strong>{vessel.flag}</strong></span>
+            <span>·</span>
+            <span>Type: <strong>{vessel.type}</strong></span>
+            <span>·</span>
+            <span>Length: <strong>{vessel.length}m</strong></span>
           </p>
         </div>
-        <div className="flex flex-col items-end">
-           <span className="text-sm text-ink-tertiary mb-1">Investigation Status</span>
-           <StatusBadge variant="info" status="ACTIVE" size="md" />
+
+        {/* Evidence Score Box */}
+        <div className="bg-white p-4 rounded-xl border border-ink-tertiary/20 shadow-sm flex items-center gap-4">
+          <div>
+            <span className="font-mono text-[10px] text-ink-tertiary uppercase block">
+              ATTRIBUTION INDEX
+            </span>
+            <span className="font-display text-3xl font-bold text-ink-primary">
+              {vessel.evidenceScore.toFixed(1)}
+              <span className="font-mono text-xs text-ink-secondary font-normal"> / 100</span>
+            </span>
+          </div>
+          <div className="w-12 h-12 rounded-full bg-ocean/10 flex items-center justify-center text-ocean">
+            <Ship className="w-6 h-6" />
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Col */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-xl border border-surface-subtle p-6 shadow-sm">
-            <h3 className="font-display font-medium text-ink-primary mb-4 flex items-center gap-2">
-               <LucideShip size={18} /> Identity Details
+      {/* Primary 3-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Vessel Particulars & Kinematics (4 cols) */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="bg-white rounded-2xl border border-ink-tertiary/20 p-6 shadow-sm space-y-4">
+            <h3 className="font-display font-bold text-base text-ink-primary flex items-center gap-2">
+              <Compass className="w-4 h-4 text-ocean" /> Vessel Specifications
             </h3>
-            <dl className="space-y-3 text-sm">
-              <div className="flex justify-between border-b border-surface-subtle pb-2">
-                <dt className="text-ink-secondary">Length</dt>
-                <dd className="font-mono text-ink-primary">{vessel.length}m</dd>
+
+            <dl className="space-y-2.5 text-xs font-mono">
+              <div className="flex justify-between border-b border-ink-tertiary/10 pb-2">
+                <dt className="text-ink-secondary">Hull Dimensions</dt>
+                <dd className="font-bold text-ink-primary">{vessel.length}m LOA · 32m Beam</dd>
               </div>
-              <div className="flex justify-between border-b border-surface-subtle pb-2">
-                <dt className="text-ink-secondary">Missing Data</dt>
-                <dd className="font-mono text-ink-primary">{vessel.missingData}</dd>
+              <div className="flex justify-between border-b border-ink-tertiary/10 pb-2">
+                <dt className="text-ink-secondary">Gross Tonnage</dt>
+                <dd className="font-bold text-ink-primary">64,200 GT</dd>
+              </div>
+              <div className="flex justify-between border-b border-ink-tertiary/10 pb-2">
+                <dt className="text-ink-secondary">Reported Voyage</dt>
+                <dd className="font-bold text-ink-primary">Fujairah &rarr; Colombo</dd>
+              </div>
+              <div className="flex justify-between border-b border-ink-tertiary/10 pb-2">
+                <dt className="text-ink-secondary">AIS Transponder Integrity</dt>
+                <dd className={cn("font-bold", isPrimarySuspect ? "text-critical" : "text-verified")}>
+                  {isPrimarySuspect ? '2-hr Gap Flagged' : '100% Broadcast'}
+                </dd>
               </div>
               <div className="flex justify-between pt-1">
-                <dt className="text-ink-secondary">Status</dt>
-                <dd className="font-mono text-ink-primary">{vessel.status}</dd>
+                <dt className="text-ink-secondary">Nearest Distance to Origin</dt>
+                <dd className="font-bold text-ink-primary">
+                  {isPrimarySuspect ? '1.2 km (Dead-Center)' : '8.2 km (Outside 80%)'}
+                </dd>
               </div>
             </dl>
           </div>
 
-          <div className="bg-white rounded-xl border border-surface-subtle p-6 shadow-sm">
-            <h3 className="font-display font-medium text-ink-primary mb-4">Compatibility Scores</h3>
-            <div className="space-y-4">
+          {/* Compatibility Breakdown */}
+          <div className="bg-white rounded-2xl border border-ink-tertiary/20 p-6 shadow-sm space-y-4">
+            <h3 className="font-display font-bold text-base text-ink-primary">
+              Evidentiary Compatibility
+            </h3>
+
+            <div className="space-y-3 font-mono text-xs">
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-ink-secondary">Temporal Alignment</span>
-                  <span className="font-mono">{vessel.compatibility.temporal}%</span>
+                <div className="flex justify-between text-ink-secondary mb-1">
+                  <span>Temporal Fit</span>
+                  <span className="font-bold text-ink-primary">{vessel.compatibility.temporal}%</span>
                 </div>
                 <ConfidenceBar value={vessel.compatibility.temporal / 100} />
               </div>
+
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-ink-secondary">Spatial Intersection</span>
-                  <span className="font-mono">{vessel.compatibility.spatial}%</span>
+                <div className="flex justify-between text-ink-secondary mb-1">
+                  <span>Spatial Proximity</span>
+                  <span className="font-bold text-ink-primary">{vessel.compatibility.spatial}%</span>
                 </div>
                 <ConfidenceBar value={vessel.compatibility.spatial / 100} />
               </div>
+
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-ink-secondary">Drift Mechanics</span>
-                  <span className="font-mono">{vessel.compatibility.drift}%</span>
+                <div className="flex justify-between text-ink-secondary mb-1">
+                  <span>Drift Mechanics Fit</span>
+                  <span className="font-bold text-marine">{vessel.compatibility.drift}%</span>
                 </div>
                 <ConfidenceBar value={vessel.compatibility.drift / 100} />
               </div>
@@ -90,46 +149,81 @@ export default async function VesselPage({ params }: { params: { id: string } })
           </div>
         </div>
 
-        {/* Right Col */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl border border-surface-subtle p-1 shadow-sm h-64 relative flex items-center justify-center overflow-hidden">
-             <div className="absolute inset-0 bg-navy/5 flex flex-col items-center justify-center">
-                 <p className="text-ink-secondary font-mono text-sm">AIS TRACK VISUALIZATION</p>
-                 <p className="text-ink-tertiary text-xs mt-1">MapLibre GL integration required</p>
-             </div>
-          </div>
+        {/* Right Column: Historical AIS Track Waypoints & Analysis (8 cols) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Anomaly Callout Banner */}
+          {isPrimarySuspect ? (
+            <div className="p-5 bg-critical/5 border border-critical/20 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-critical">
+                <AlertTriangle className="w-4 h-4 text-critical" />
+                <span>PRIMARY EVIDENCE: ANOMALOUS TRANSPONDER BLACKOUT</span>
+              </div>
+              <p className="text-xs font-body text-ink-secondary leading-relaxed">
+                Between 13:30 and 15:30 UTC, MV Horizon Trader ceased transmitting AIS messages while operating in open Arabian Sea waters under normal sea state conditions. Prior to signal cessation, vessel speed decreased from 12.5 kts to 9.1 kts. Upon resuming broadcast, the vessel was on a course departing the now-detected slick centroid.
+              </p>
+            </div>
+          ) : (
+            <div className="p-5 bg-verified/5 border border-verified/20 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-verified">
+                <ShieldCheck className="w-4 h-4 text-verified" />
+                <span>EXCULPATORY FINDINGS: DEPRIORITIZED CANDIDATE</span>
+              </div>
+              <p className="text-xs font-body text-ink-secondary leading-relaxed">
+                Transited through the regional corridor 6 hours prior to the estimated oil release window with continuous AIS telemetry broadcasts and steady speed.
+              </p>
+            </div>
+          )}
 
-          <div className="bg-white rounded-xl border border-surface-subtle p-6 shadow-sm">
-            <h3 className="font-display font-medium text-ink-primary mb-4">Evidentiary Graph</h3>
-            
-            <div className="space-y-6">
-               <div>
-                  <h4 className="text-sm font-medium text-verified flex items-center gap-2 mb-3">
-                     <LucideCheckCircle size={16} /> Supporting Evidence
-                  </h4>
-                  <div className="space-y-3">
-                     <div className="p-3 bg-surface border border-surface-subtle rounded-md flex justify-between items-center">
-                        <span className="text-sm text-ink-primary">AIS track intersects spill origin estimate</span>
-                        <div className="w-20"><ConfidenceBar value={0.95} /></div>
-                     </div>
-                     <div className="p-3 bg-surface border border-surface-subtle rounded-md flex justify-between items-center">
-                        <span className="text-sm text-ink-primary">Speed drop matches typical discharge profile</span>
-                        <div className="w-20"><ConfidenceBar value={0.82} /></div>
-                     </div>
-                  </div>
-               </div>
+          {/* Historical Waypoints Table */}
+          <div className="bg-white rounded-2xl border border-ink-tertiary/20 shadow-sm overflow-hidden">
+            <div className="p-4 bg-surface-subtle border-b border-ink-tertiary/10 flex items-center justify-between font-mono text-xs">
+              <div className="flex items-center gap-2">
+                <Radio className="w-4 h-4 text-ocean" />
+                <span className="font-bold text-ink-primary">RECONSTRUCTED AIS LOGS</span>
+              </div>
+              <span className="text-ink-tertiary">{vessel.aisTrack?.length || 0} Recorded Hits</span>
+            </div>
 
-               <div>
-                  <h4 className="text-sm font-medium text-critical flex items-center gap-2 mb-3">
-                     <LucideAlertTriangle size={16} /> Contradicting Evidence
-                  </h4>
-                  <div className="space-y-3">
-                     <div className="p-3 bg-surface border border-surface-subtle rounded-md flex justify-between items-center">
-                        <span className="text-sm text-ink-primary">Reported draft change inconsistent with volume</span>
-                        <div className="w-20"><ConfidenceBar value={0.45} /></div>
-                     </div>
-                  </div>
-               </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs font-mono text-left">
+                <thead className="bg-surface border-b border-ink-tertiary/10 text-ink-tertiary uppercase">
+                  <tr>
+                    <th className="p-3">Timestamp (UTC)</th>
+                    <th className="p-3">Latitude</th>
+                    <th className="p-3">Longitude</th>
+                    <th className="p-3">Speed</th>
+                    <th className="p-3">Heading</th>
+                    <th className="p-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink-tertiary/10 text-ink-secondary">
+                  {vessel.aisTrack?.map((pt: any, idx: number) => {
+                    const isGapPoint = isPrimarySuspect && idx === 2;
+                    return (
+                      <tr
+                        key={idx}
+                        className={cn(
+                          "hover:bg-surface-subtle transition-colors",
+                          isGapPoint ? "bg-amber-500/10 text-amber-800 font-bold" : ""
+                        )}
+                      >
+                        <td className="p-3">{pt.timestamp}</td>
+                        <td className="p-3">{pt.lat.toFixed(2)}°N</td>
+                        <td className="p-3">{pt.lng.toFixed(2)}°E</td>
+                        <td className="p-3">{pt.speed} kts</td>
+                        <td className="p-3">{pt.heading}°</td>
+                        <td className="p-3">
+                          {isGapPoint ? (
+                            <span className="text-critical font-bold">TRANSMISSION GAP</span>
+                          ) : (
+                            <span className="text-verified">BROADCAST OK</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

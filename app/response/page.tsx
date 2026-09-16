@@ -1,102 +1,187 @@
 'use client';
-import { useState } from 'react';
+
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DEMO_RESPONSE_SCENARIOS } from '@/data/demo-response';
-import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
-import { LucideWind, LucideWaves, LucideAlertTriangle } from 'lucide-react';
+import {
+  Wind,
+  Waves,
+  ShieldCheck,
+  Anchor,
+  Plane,
+  CheckCircle2,
+  Clock,
+  ArrowRight,
+  AlertTriangle,
+} from 'lucide-react';
+
+const InvestigationMap = dynamic(() => import('@/components/maps/InvestigationMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="relative h-full bg-surface-subtle rounded-2xl border border-ink-tertiary/20 flex items-center justify-center">
+      <div className="text-center font-mono text-xs text-ink-tertiary">
+        <span className="animate-pulse block mb-2">INITIALIZING RESPONSE TACTICAL MAP...</span>
+        <span>MapLibre GL · Arabian Sea Asset Network</span>
+      </div>
+    </div>
+  ),
+});
 
 export default function ResponsePage() {
-  const [activeScenarioId, setActiveScenarioId] = useState(DEMO_RESPONSE_SCENARIOS[0].id);
+  const [activeScenarioId, setActiveScenarioId] = useState<string>(DEMO_RESPONSE_SCENARIOS[0].id);
+  const [isDeployed, setIsDeployed] = useState<boolean>(false);
 
-  const activeScenario = DEMO_RESPONSE_SCENARIOS.find((s: any) => s.id === activeScenarioId) || DEMO_RESPONSE_SCENARIOS[0];
+  const activeScenario =
+    DEMO_RESPONSE_SCENARIOS.find((s: any) => s.id === activeScenarioId) || DEMO_RESPONSE_SCENARIOS[0];
+
+  const handleDeploy = () => {
+    setIsDeployed(true);
+    setTimeout(() => {
+      setIsDeployed(false);
+    }, 4000);
+  };
 
   return (
-    <div className="flex flex-col h-screen pt-16 bg-surface overflow-hidden">
-      <DataModeIndicator mode="DEMO" />
-      
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left: Map Area (60%) */}
-        <div className="w-[60%] h-full p-4">
-          <div className="relative h-full bg-navy/5 rounded-lg overflow-hidden border border-surface-subtle flex flex-col items-center justify-center">
-             <div className="text-center z-10 p-6 bg-white/80 backdrop-blur rounded shadow-sm">
-                <p className="text-ink-primary font-display font-medium text-lg">Response Map Placeholder</p>
-                <p className="text-ink-secondary text-sm mt-1">Shows spill trajectory and asset deployment</p>
-             </div>
-             {/* Map grids */}
-             <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-10 pointer-events-none">
-                {Array.from({length: 64}).map((_, i) => <div key={i} className="border border-ocean" />)}
-             </div>
-          </div>
+    <div className="flex flex-col h-screen pt-16 bg-surface overflow-hidden select-none">
+      {/* Top Banner */}
+      <div className="flex items-center justify-between px-6 py-2.5 border-b border-ink-tertiary/15 bg-white shadow-sm shrink-0 z-20">
+        <div className="flex items-center gap-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-ocean animate-ping" />
+          <span className="font-mono text-xs font-bold text-ink-primary tracking-wider uppercase">
+            INCIDENT RESPONSE & DISPATCH DECISION SUPPORT
+          </span>
+          <span className="text-ink-tertiary text-xs">|</span>
+          <span className="font-mono text-xs text-ink-secondary">
+            CASE #ST-2026-0042 · INDIAN COAST GUARD OPERATIONS
+          </span>
         </div>
 
-        {/* Right: Response Controls (40%) */}
-        <div className="w-[40%] h-full overflow-y-auto border-l border-surface-subtle bg-white">
-          <div className="p-6">
-            <h2 className="text-h3 font-display text-ink-primary mb-6">Response Decision Support</h2>
-            
-            {/* Environment Conditions */}
-            <div className="flex gap-4 mb-8">
-               <div className="flex items-center gap-2 text-sm text-ink-secondary bg-surface px-3 py-2 rounded-md border border-surface-subtle">
-                  <LucideWind size={16} /> 12 kts NE
-               </div>
-               <div className="flex items-center gap-2 text-sm text-ink-secondary bg-surface px-3 py-2 rounded-md border border-surface-subtle">
-                  <LucideWaves size={16} /> 1.2m Swell
-               </div>
-            </div>
+        <DataModeIndicator mode="DEMO" />
+      </div>
 
-            {/* Scenarios */}
-            <h3 className="text-sm font-medium text-ink-secondary uppercase tracking-wider mb-3">Intervention Scenarios</h3>
-            <div className="space-y-3 mb-8">
-              {DEMO_RESPONSE_SCENARIOS.map((scenario: any) => (
-                <button
-                  key={scenario.id}
-                  onClick={() => setActiveScenarioId(scenario.id)}
-                  className={cn(
-                    "w-full text-left p-4 rounded-lg border transition-all",
-                    activeScenarioId === scenario.id
-                      ? "border-ocean bg-ocean/5 shadow-sm"
-                      : "border-surface-subtle bg-surface hover:bg-surface-subtle/50"
-                  )}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-ink-primary">{scenario.name}</span>
-                    <span className="text-xs font-mono bg-white px-2 py-1 rounded border border-surface-subtle">{scenario.priority} PRIORITY</span>
-                  </div>
-                  <p className="text-sm text-ink-secondary">{scenario.description}</p>
-                </button>
-              ))}
-            </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Tactical Response Map (64%) */}
+        <div className="w-[64%] h-full p-4 flex flex-col">
+          <InvestigationMap />
+        </div>
 
-            {/* Active Scenario Details */}
-            <div className="bg-surface rounded-xl p-5 border border-surface-subtle">
-               <h3 className="font-medium text-ink-primary mb-4">Estimated Impact: {activeScenario.name}</h3>
-               
-               <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-ink-secondary">Predicted Outcome</span>
-                      <span className="font-mono text-ocean">{activeScenario.predictedOutcome}</span>
+        {/* Right: Response Management Workbench (36%) */}
+        <div className="w-[36%] h-full overflow-y-auto border-l border-ink-tertiary/15 bg-surface-subtle/30 p-6 space-y-6">
+          <div>
+            <span className="font-mono text-xs text-ocean font-bold uppercase tracking-wider block mb-1">
+              MARITIME LOGISTICS ENGINE
+            </span>
+            <h2 className="font-display font-bold text-2xl text-ink-primary">
+              Response Strategy Coordinator
+            </h2>
+            <p className="text-xs font-body text-ink-secondary mt-1">
+              Automated resource allocation matching projected slick trajectories against regional Coast Guard and port assets.
+            </p>
+          </div>
+
+          {/* Environmental Conditions */}
+          <div className="grid grid-cols-2 gap-3 font-mono text-xs">
+            <div className="flex items-center gap-2.5 p-3 bg-white rounded-xl border border-ink-tertiary/15 shadow-sm">
+              <Wind className="w-4 h-4 text-sky-500" />
+              <div>
+                <span className="text-[10px] text-ink-tertiary block">SURFACE WIND</span>
+                <span className="font-bold text-ink-primary">14 kts @ 235° SW</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 p-3 bg-white rounded-xl border border-ink-tertiary/15 shadow-sm">
+              <Waves className="w-4 h-4 text-teal-500" />
+              <div>
+                <span className="text-[10px] text-ink-tertiary block">INCOIS SWELL</span>
+                <span className="font-bold text-ink-primary">1.4m (State 3)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Scenarios Selection */}
+          <div className="space-y-3">
+            <span className="text-xs font-mono text-ink-tertiary uppercase tracking-wider block font-bold">
+              INTERVENTION SCENARIOS
+            </span>
+
+            <div className="space-y-3">
+              {DEMO_RESPONSE_SCENARIOS.map((scenario: any) => {
+                const isSelected = activeScenarioId === scenario.id;
+                return (
+                  <button
+                    key={scenario.id}
+                    onClick={() => setActiveScenarioId(scenario.id)}
+                    className={cn(
+                      "w-full text-left p-4 rounded-xl border transition-all duration-200 space-y-2",
+                      isSelected
+                        ? "bg-white border-ocean ring-1 ring-ocean/40 shadow-md"
+                        : "bg-white/70 border-ink-tertiary/15 hover:border-ink-tertiary/30 shadow-sm"
+                    )}
+                  >
+                    <div className="flex justify-between items-start">
+                      <span className="font-display font-bold text-sm text-ink-primary">
+                        {scenario.name}
+                      </span>
+                      <StatusBadge
+                        variant={scenario.priority === 'HIGH' ? 'critical' : 'verified'}
+                        status={`${scenario.priority} PRIORITY`}
+                      />
                     </div>
-                  </div>
+                    <p className="text-xs font-body text-ink-secondary leading-relaxed">
+                      {scenario.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                  <div className="pt-4 border-t border-surface-subtle">
-                    <h4 className="text-sm font-medium text-ink-primary mb-3">Required Assets</h4>
-                    <ul className="space-y-2">
-                      {activeScenario.assetsRequired.map((assetId: string, i: number) => (
-                        <li key={i} className="text-sm text-ink-secondary flex items-center gap-2">
-                           <div className="w-1.5 h-1.5 rounded-full bg-ocean"></div>
-                           {assetId}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-               </div>
+          {/* Active Scenario Impact Breakdown */}
+          <div className="bg-white rounded-xl p-5 border border-ink-tertiary/20 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-ink-tertiary/10 pb-3">
+              <h4 className="font-display text-sm font-bold text-ink-primary">
+                Tactical Impact: {activeScenario.name}
+              </h4>
+              <span className="font-mono text-xs font-bold text-ocean">
+                {activeScenario.predictedOutcome}
+              </span>
             </div>
 
-            <div className="mt-8">
-               <Button className="w-full justify-center">Deploy Plan: {activeScenario.name}</Button>
+            <div className="space-y-2">
+              <span className="font-mono text-[10px] text-ink-tertiary uppercase font-bold block">
+                COMMITTED REGIONAL ASSETS
+              </span>
+              <div className="space-y-1.5">
+                {activeScenario.assetsRequired.map((assetId: string, i: number) => (
+                  <div
+                    key={i}
+                    className="text-xs font-mono text-ink-secondary flex items-center justify-between p-2 bg-surface-subtle rounded-lg"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Anchor className="w-3.5 h-3.5 text-ocean" />
+                      {assetId}
+                    </span>
+                    <span className="text-[10px] text-verified font-bold">READY</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {isDeployed ? (
+              <div className="p-3 bg-verified/10 border border-verified/30 rounded-xl text-center font-mono text-xs text-verified font-bold flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                DISPATCH ORDER TRANSMITTED TO ICG COMMAND
+              </div>
+            ) : (
+              <button
+                onClick={handleDeploy}
+                className="w-full py-3 bg-ocean hover:bg-ocean/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2"
+              >
+                DEPLOY INTERVENTION PLAN &rarr;
+              </button>
+            )}
           </div>
         </div>
       </div>

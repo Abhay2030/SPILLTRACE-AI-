@@ -24,24 +24,25 @@ const fragmentShader = `
   varying vec3 vPosition;
 
   void main() {
-    // Physical Rayleigh scattering rim calculation
+    // Physical Rayleigh scattering rim calculation (softer falloff)
     vec3 viewDir = normalize(cameraPosition - vPosition);
-    float rim = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 3.8);
+    float rim = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 3.0);
 
     // Sunlit side modulation: atmosphere is illuminated by the sun
     vec3 lightDir = normalize(uSunDirection);
     float NdotL = dot(vWorldNormal, lightDir);
-    float sunLit = smoothstep(-0.2, 0.35, NdotL);
+    float sunLit = smoothstep(-0.2, 0.5, NdotL);
 
-    // Deep marine blue to soft azure atmospheric spectrum
-    vec3 atmosphereColor = mix(vec3(0.04, 0.38, 0.82), vec3(0.32, 0.72, 0.98), rim);
+    // Bright, luminous cyan to deep azure atmospheric spectrum
+    vec3 atmosphereColor = mix(vec3(0.1, 0.45, 0.9), vec3(0.4, 0.8, 1.0), rim);
 
-    gl_FragColor = vec4(atmosphereColor, rim * sunLit * 0.42);
+    gl_FragColor = vec4(atmosphereColor, rim * sunLit * 0.65);
   }
 `;
 
 export default function Atmosphere() {
-  const radius = typeof ATMOSPHERE_RADIUS !== 'undefined' ? ATMOSPHERE_RADIUS : 2.036;
+  // Slightly expanded radius for that glowing halo
+  const radius = typeof ATMOSPHERE_RADIUS !== 'undefined' ? ATMOSPHERE_RADIUS : 2.06;
 
   const uniforms = useMemo(
     () => ({

@@ -37,6 +37,9 @@ const earthFragmentShader = `
   void main() {
     // 1. Texture lookups
     vec4 dayColor = texture2D(dayTexture, vUv);
+    // Brighten the day texture slightly for that vibrant ocean look
+    dayColor.rgb = pow(dayColor.rgb, vec3(0.85)) * 1.1;
+
     vec4 nightColor = texture2D(nightTexture, vUv);
     float specMask = texture2D(specularTexture, vUv).r;
     float bump = texture2D(bumpTexture, vUv).r;
@@ -45,34 +48,36 @@ const earthFragmentShader = `
     vec3 lightDir = normalize(sunDirection);
     float NdotL = dot(vWorldNormal, lightDir);
     
-    // Physically authentic twilight transition along the solar terminator
-    float dayFactor = smoothstep(-0.08, 0.15, NdotL);
-    float twilight = exp(-pow((NdotL - 0.02) / 0.10, 2.0));
+    // Smooth and wide terminator transition
+    float dayFactor = smoothstep(-0.15, 0.25, NdotL);
+    float twilight = exp(-pow((NdotL - 0.0) / 0.15, 2.0));
 
-    // 3. Specular Ocean Sun Glint (Directional reflection on water)
+    // 3. Specular Ocean Sun Glint
     vec3 viewDir = normalize(cameraPosition - vPosition);
     vec3 halfVector = normalize(lightDir + viewDir);
     float NdotH = max(dot(vWorldNormal, halfVector), 0.0);
-    // Warm solar glint with sharp falloff only over oceanic bodies
-    vec3 sunGlint = vec3(1.0, 0.95, 0.88) * pow(NdotH, 64.0) * specMask * max(0.0, NdotL) * 1.1;
+    // Soften the glint slightly
+    vec3 sunGlint = vec3(1.0, 0.95, 0.9) * pow(NdotH, 48.0) * specMask * max(0.0, NdotL) * 0.8;
 
     // 4. Compose Day and Night
-    float diffuse = clamp(NdotL, 0.0, 1.0) * 0.82 + 0.18; // Soft ambient bounce
+    // Flatter diffuse for a more photographic exposure
+    float diffuse = clamp(NdotL, 0.0, 1.0) * 0.65 + 0.35;
     vec3 surfaceDay = (dayColor.rgb * diffuse) + sunGlint;
 
-    // Warm atmospheric twilight reddening along terminator line
-    vec3 twilightColor = vec3(0.92, 0.44, 0.16) * twilight * 0.38;
+    // Subtle atmospheric twilight reddening along terminator line
+    vec3 twilightColor = vec3(0.85, 0.45, 0.25) * twilight * 0.25;
 
-    // Night side terrestrial city lights (strictly masked to land masses)
-    vec3 surfaceNight = nightColor.rgb * 1.6;
+    // Night side terrestrial city lights
+    vec3 surfaceNight = nightColor.rgb * 1.5;
 
     vec3 finalColor = mix(surfaceNight, surfaceDay, dayFactor) + twilightColor;
 
-    // 5. Authentic Rayleigh Atmospheric Limb (Illuminated only on sunlit horizon)
+    // 5. Authentic Rayleigh Atmospheric Limb
     float viewAngle = max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
-    float limbFresnel = pow(1.0 - viewAngle, 3.2);
-    float sunLitLimb = clamp(NdotL + 0.15, 0.0, 1.0);
-    vec3 atmosphereLimb = vec3(0.16, 0.62, 0.96) * limbFresnel * sunLitLimb * 0.45;
+    float limbFresnel = pow(1.0 - viewAngle, 2.8);
+    float sunLitLimb = clamp(NdotL + 0.2, 0.0, 1.0);
+    // Brighter, more cyan/blue limb to match the image
+    vec3 atmosphereLimb = vec3(0.25, 0.65, 1.0) * limbFresnel * sunLitLimb * 0.5;
 
     gl_FragColor = vec4(finalColor + atmosphereLimb, 1.0);
   }

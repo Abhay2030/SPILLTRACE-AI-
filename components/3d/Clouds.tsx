@@ -60,22 +60,24 @@ const cloudFragmentShader = `
     float turbulence = fbm(flowUv) * 0.22;
 
     // Composite authentic satellite weather pattern with fluid evolution
-    float cloudDensity = clamp(satClouds * 0.85 + turbulence, 0.0, 1.0);
-    float rawAlpha = smoothstep(0.18, 0.65, cloudDensity);
+    // Increase density to make clouds thicker like the reference image
+    float cloudDensity = clamp(satClouds * 0.9 + turbulence, 0.0, 1.0);
+    float rawAlpha = smoothstep(0.12, 0.60, cloudDensity);
 
     // 3. Solar illumination and terminator tinting
     vec3 lightDir = normalize(uSunDirection);
     float NdotL = dot(vNormal, lightDir);
-    float dayFactor = smoothstep(-0.08, 0.22, NdotL);
-    float sunset = exp(-pow((NdotL - 0.03) / 0.11, 2.0));
+    float dayFactor = smoothstep(-0.1, 0.3, NdotL);
+    float sunset = exp(-pow((NdotL - 0.0) / 0.15, 2.0));
 
-    // Crisp white sunlit clouds with warm golden-amber rims at the terminator
-    vec3 dayCloud = vec3(0.96, 0.98, 1.0);
-    vec3 sunsetCloud = vec3(1.0, 0.58, 0.30);
-    vec3 cloudColor = mix(dayCloud, sunsetCloud, sunset * 0.65);
+    // Extremely crisp white sunlit clouds
+    vec3 dayCloud = vec3(1.0, 1.0, 1.0);
+    vec3 sunsetCloud = vec3(1.0, 0.75, 0.5);
+    vec3 cloudColor = mix(dayCloud, sunsetCloud, sunset * 0.5);
 
-    // 4. Night side attenuation: allows city lights to remain visible from orbit
-    float finalAlpha = rawAlpha * mix(0.08, 0.40, dayFactor);
+    // 4. Night side attenuation
+    // Slightly more visible on the night side to keep the volume
+    float finalAlpha = rawAlpha * mix(0.1, 0.65, dayFactor);
 
     gl_FragColor = vec4(cloudColor, finalAlpha);
   }

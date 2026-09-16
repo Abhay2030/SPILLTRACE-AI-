@@ -85,108 +85,126 @@ export function Chapter01Ocean() {
   return (
     <section
       ref={containerRef}
-      className="chapter-section min-h-screen relative flex flex-col justify-between items-center p-6 md:p-12 z-10"
+      className="chapter-section min-h-screen relative flex flex-col justify-between items-center p-6 md:p-12 z-10 select-none"
     >
-      {/* Top telemetry bar */}
-      <div className="hero-telemetry w-full max-w-6xl flex justify-between items-center pt-2 text-[11px] font-mono tracking-wider text-ink-tertiary">
+      {/* Top Aerospace Telemetry Ribbon */}
+      <div className="hero-telemetry w-full max-w-6xl flex justify-between items-center py-2.5 px-6 rounded-full bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 shadow-[0_4px_25px_rgba(0,0,0,0.7)] text-xs font-mono text-slate-200">
         <div className="flex items-center gap-2.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-verified animate-pulse" />
-          <span className="text-ink-secondary font-medium">SURVEILLANCE SECTOR: ARABIAN SEA</span>
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+          </span>
+          <span className="text-white font-bold tracking-wider">SECTOR: ARABIAN SEA (BRAVO-4)</span>
         </div>
         <div className="hidden sm:flex items-center gap-6">
           <span className="flex items-center gap-1.5">
-            <Radio size={12} className="text-marine" /> AIS RECEPTION: NOMINAL
+            <Radio size={13} className="text-cyan-400" />
+            <span className="text-cyan-200 font-semibold">AIS: NOMINAL (247 TGT)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Satellite size={12} className="text-ocean" /> ORBIT: SENTINEL-1A
+            <Satellite size={13} className="text-sky-400" />
+            <span className="text-sky-200 font-semibold">ORBIT: SENTINEL-1A (C-SAR)</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Clock size={12} className="text-ink-secondary" /> {timeUtc}
+            <Clock size={13} className="text-amber-400" />
+            <span className="text-amber-300 font-bold">{timeUtc}</span>
           </span>
         </div>
       </div>
 
-      {/* Hero Central Focus */}
-      <div className="max-w-4xl mx-auto text-center my-auto px-4 py-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean/5 border border-ocean/15 text-ocean text-xs font-mono tracking-widest uppercase mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-ocean" />
+      {/* Hero Central Focus with Aerospace Glassmorphic Plate */}
+      <div className="max-w-4xl mx-auto text-center my-auto px-6 py-10 sm:px-12 sm:py-14 rounded-3xl bg-slate-950/75 backdrop-blur-2xl border border-cyan-500/30 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(6,182,212,0.2)] relative overflow-hidden">
+        {/* Ambient Radial Illumination */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-cyan-500/25 blur-3xl pointer-events-none rounded-full" />
+
+        {/* Hackathon Badge */}
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
+          </span>
           Smart India Hackathon 2026 · SIH26143
         </div>
 
-        <h1 className="hero-title font-display font-bold text-5xl sm:text-6xl md:text-8xl text-ink-primary tracking-tight leading-[1.05] mb-6">
+        {/* Cinematic Title & Tagline */}
+        <h1 className="hero-title font-display font-black text-6xl sm:text-7xl md:text-9xl text-white tracking-tight leading-none mb-3 drop-shadow-[0_10px_35px_rgba(0,0,0,0.95)]">
           SPILLTRACE AI
-          <span className="block text-3xl sm:text-4xl md:text-5xl font-medium text-ink-secondary mt-2 tracking-normal">
+          <span className="block text-3xl sm:text-5xl md:text-6xl font-extrabold mt-3 tracking-tight text-cinematic-cyan drop-shadow-[0_4px_25px_rgba(6,182,212,0.7)]">
             From Space to Suspect.
           </span>
         </h1>
 
-        <p className="hero-sub font-body text-lg sm:text-xl text-ink-secondary max-w-2xl mx-auto leading-relaxed mb-10">
+        {/* Mission Statement */}
+        <p className="hero-sub font-body text-base sm:text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto leading-relaxed mt-6 mb-10 font-medium drop-shadow-[0_2px_12px_rgba(0,0,0,0.95)]">
           AI-powered maritime forensics and response intelligence. Reconstructing oil spill origins by fusing satellite radar with vessel kinematics and ocean physics.
         </p>
 
-        {/* Primary CTAs */}
-        <div className="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/investigate">
-            <Button size="lg" className="px-8 py-3.5 text-sm uppercase tracking-wider font-semibold shadow-elevated">
+        {/* Primary Action Buttons */}
+        <div className="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-5">
+          <Link href="/investigate" className="w-full sm:w-auto">
+            <button className="group relative w-full sm:w-auto inline-flex items-center justify-center px-9 py-4 rounded-xl text-white font-bold text-sm sm:text-base uppercase tracking-wider bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-[0_0_35px_rgba(6,182,212,0.6)] border border-cyan-300/60 hover:scale-105 transition-all duration-300 cursor-pointer">
+              <Compass className="w-5 h-5 mr-2 group-hover:rotate-45 transition-transform" />
               Start Investigation
-            </Button>
+            </button>
           </Link>
-          <Button
-            variant="secondary"
-            size="lg"
+          <button
             onClick={scrollToInvestigation}
-            className="px-6 py-3.5 text-sm uppercase tracking-wider text-ink-primary hover:bg-white/80 backdrop-blur-sm border-border"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-xl text-white font-bold text-sm sm:text-base uppercase tracking-wider bg-slate-900/85 hover:bg-slate-800 border border-slate-700 hover:border-cyan-400 backdrop-blur-xl shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer text-slate-100"
           >
-            <Play size={14} className="mr-2 fill-current text-ocean" />
+            <Play size={16} className="mr-2.5 fill-current text-cyan-400" />
             Watch Investigation
-          </Button>
+          </button>
         </div>
       </div>
 
-      {/* Bottom Mission-Control Telemetry Ribbon */}
-      <div className="hero-hud w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 pb-4">
-        <div className="p-3.5 rounded-xl bg-white/70 backdrop-blur-md border border-border-subtle shadow-subtle text-left">
-          <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-widest flex items-center gap-1.5 mb-1">
-            <Compass size={11} className="text-ocean" /> Target Coordinates
+      {/* Bottom Mission-Control Telemetry HUD Cards */}
+      <div className="hero-hud w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 pb-4">
+        <div className="glass-card-cinematic rounded-2xl p-4 sm:p-5 text-left group hover:border-cyan-400/60 transition-all">
+          <div className="text-[11px] font-mono text-cyan-400 uppercase tracking-widest flex items-center gap-2 font-bold mb-1">
+            <Compass size={13} className="text-cyan-400 group-hover:rotate-45 transition-transform" />
+            Target Coordinates
           </div>
-          <div className="font-mono text-xs font-semibold text-ink-primary">15.28°N, 72.05°E</div>
-          <div className="text-[10px] text-ink-secondary mt-0.5">Goa Offshore (~180 km West)</div>
+          <div className="font-mono text-base sm:text-lg font-black text-white drop-shadow">15.28°N, 72.05°E</div>
+          <div className="text-xs text-slate-300 font-medium mt-0.5">Goa Offshore (~180 km West)</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white/70 backdrop-blur-md border border-border-subtle shadow-subtle text-left">
-          <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-widest flex items-center gap-1.5 mb-1">
-            <Satellite size={11} className="text-marine" /> Sensor Modality
+        <div className="glass-card-cinematic rounded-2xl p-4 sm:p-5 text-left group hover:border-cyan-400/60 transition-all">
+          <div className="text-[11px] font-mono text-sky-400 uppercase tracking-widest flex items-center gap-2 font-bold mb-1">
+            <Satellite size={13} className="text-sky-400" />
+            Sensor Modality
           </div>
-          <div className="font-mono text-xs font-semibold text-ink-primary">C-Band SAR (10m)</div>
-          <div className="text-[10px] text-ink-secondary mt-0.5">Dual-Pol VV+VH StripMap</div>
+          <div className="font-mono text-base sm:text-lg font-black text-white drop-shadow">C-Band SAR (10m)</div>
+          <div className="text-xs text-slate-300 font-medium mt-0.5">Dual-Pol VV+VH StripMap</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white/70 backdrop-blur-md border border-border-subtle shadow-subtle text-left">
-          <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-widest flex items-center gap-1.5 mb-1">
-            <Radio size={11} className="text-verified" /> Traffic Density
+        <div className="glass-card-cinematic rounded-2xl p-4 sm:p-5 text-left group hover:border-cyan-400/60 transition-all">
+          <div className="text-[11px] font-mono text-emerald-400 uppercase tracking-widest flex items-center gap-2 font-bold mb-1">
+            <Radio size={13} className="text-emerald-400" />
+            Traffic Density
           </div>
-          <div className="font-mono text-xs font-semibold text-ink-primary">247 Tracked Vessels</div>
-          <div className="text-[10px] text-ink-secondary mt-0.5">24h Correlation Window</div>
+          <div className="font-mono text-base sm:text-lg font-black text-white drop-shadow">247 Tracked Vessels</div>
+          <div className="text-xs text-slate-300 font-medium mt-0.5">24h Correlation Window</div>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-white/70 backdrop-blur-md border border-border-subtle shadow-subtle text-left">
-          <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-widest flex items-center gap-1.5 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-verified" /> System Mode
+        <div className="glass-card-cinematic rounded-2xl p-4 sm:p-5 text-left group hover:border-cyan-400/60 transition-all">
+          <div className="text-[11px] font-mono text-amber-400 uppercase tracking-widest flex items-center gap-2 font-bold mb-1">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            System Mode
           </div>
-          <div className="font-mono text-xs font-semibold text-ink-primary">DEMO · SIMULATED</div>
-          <div className="text-[10px] text-ink-secondary mt-0.5">Incident ID: ST-2026-0042</div>
+          <div className="font-mono text-base sm:text-lg font-black text-white drop-shadow">DEMO · SIMULATED</div>
+          <div className="text-xs text-slate-300 font-medium mt-0.5">Incident ID: ST-2026-0042</div>
         </div>
       </div>
 
-      {/* Subtle Scroll Down Prompt */}
+      {/* Cinematic Scroll Down Indicator */}
       <div
         onClick={scrollToInvestigation}
-        className="scroll-indicator cursor-pointer text-ink-tertiary hover:text-ocean transition-colors flex flex-col items-center gap-1 mt-2"
+        className="scroll-indicator cursor-pointer text-cyan-400 hover:text-cyan-300 transition-colors flex flex-col items-center gap-1.5 mt-2 drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]"
         role="button"
         aria-label="Scroll to investigation"
       >
-        <span className="text-[10px] font-mono tracking-widest uppercase">INVESTIGATION CHAPTERS</span>
-        <ArrowDown size={14} />
+        <span className="text-[11px] font-mono tracking-widest uppercase font-bold">INVESTIGATION TIMELINE</span>
+        <ArrowDown size={16} className="animate-bounce" />
       </div>
     </section>
   );

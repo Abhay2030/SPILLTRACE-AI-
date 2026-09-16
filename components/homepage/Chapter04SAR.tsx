@@ -38,32 +38,32 @@ export function Chapter04SAR() {
       <div className="w-full max-w-5xl mx-auto flex flex-col items-center space-y-8">
         {/* Header */}
         <div className="sar-heading text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur-md border border-border-subtle text-ink-tertiary text-xs font-mono tracking-widest uppercase">
-            <Layers size={12} className="text-ocean" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 text-xs font-mono tracking-widest uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+            <Layers size={13} className="text-cyan-400" />
             CHAPTER 04 · SAR VISUALIZATION & INTERPRETATION
           </div>
-          <h2 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl text-ink-primary tracking-tight">
+          <h2 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-white tracking-tight drop-shadow-[0_4px_25px_rgba(0,0,0,0.95)]">
             See what the ocean surface hides.
           </h2>
-          <p className="font-body text-base sm:text-lg text-ink-secondary max-w-2xl mx-auto leading-relaxed">
+          <p className="font-body text-base sm:text-lg text-slate-200 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow">
             Transitioning from raw radar backscatter returns to segmented hydrocarbon polygons. Oil dampens high-frequency gravity-capillary waves, appearing as a characteristic dark signature.
           </p>
         </div>
 
         {/* Interactive Viewer Card */}
-        <div className="sar-canvas-card w-full bg-white rounded-2xl border border-border shadow-elevated p-4 sm:p-6 space-y-4">
+        <div className="sar-canvas-card w-full glass-card-cinematic rounded-3xl p-5 sm:p-7 space-y-5 shadow-2xl">
           {/* Top Control Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border-subtle text-xs font-mono">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-700/80 text-xs font-mono">
             <div className="flex items-center gap-2">
-              <span className="text-ink-secondary font-medium">VIEW MODALITY:</span>
-              <div className="inline-flex bg-surface-subtle p-1 rounded-lg border border-border-subtle">
+              <span className="text-cyan-300 font-semibold tracking-wider">VIEW MODALITY:</span>
+              <div className="inline-flex bg-slate-900 p-1 rounded-xl border border-slate-700">
                 <button
                   onClick={() => setViewMode('optical')}
                   className={cn(
-                    'px-3 py-1 rounded-md transition-all font-mono text-xs',
+                    'px-3.5 py-1.5 rounded-lg transition-all font-mono text-xs cursor-pointer',
                     viewMode === 'optical'
-                      ? 'bg-white text-ink-primary shadow-sm font-semibold'
-                      : 'text-ink-secondary hover:text-ink-primary'
+                      ? 'bg-cyan-500 text-white shadow font-bold'
+                      : 'text-slate-300 hover:text-white'
                   )}
                 >
                   Natural Ocean
@@ -71,10 +71,10 @@ export function Chapter04SAR() {
                 <button
                   onClick={() => setViewMode('sar')}
                   className={cn(
-                    'px-3 py-1 rounded-md transition-all font-mono text-xs',
+                    'px-3.5 py-1.5 rounded-lg transition-all font-mono text-xs cursor-pointer',
                     viewMode === 'sar'
-                      ? 'bg-white text-ink-primary shadow-sm font-semibold'
-                      : 'text-ink-secondary hover:text-ink-primary'
+                      ? 'bg-cyan-500 text-white shadow font-bold'
+                      : 'text-slate-300 hover:text-white'
                   )}
                 >
                   Raw SAR Backscatter
@@ -82,10 +82,10 @@ export function Chapter04SAR() {
                 <button
                   onClick={() => setViewMode('segmentation')}
                   className={cn(
-                    'px-3 py-1 rounded-md transition-all font-mono text-xs',
+                    'px-3.5 py-1.5 rounded-lg transition-all font-mono text-xs cursor-pointer',
                     viewMode === 'segmentation'
-                      ? 'bg-ocean text-white shadow-sm font-semibold'
-                      : 'text-ink-secondary hover:text-ink-primary'
+                      ? 'bg-gradient-to-r from-cyan-500 to-ocean text-white shadow font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)]'
+                      : 'text-slate-300 hover:text-white'
                   )}
                 >
                   AI Segmentation
@@ -93,8 +93,8 @@ export function Chapter04SAR() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-ink-tertiary">
-              <span className="hidden sm:inline font-mono">LAT: 15.22°N · LON: 72.08°E</span>
+            <div className="flex items-center gap-3 text-cyan-300">
+              <span className="hidden sm:inline font-mono font-medium">LAT: 15.22°N · LON: 72.08°E</span>
               <StatusBadge variant="info" status="CALIBRATED" size="sm" />
             </div>
           </div>
@@ -183,26 +183,26 @@ export function Chapter04SAR() {
           </div>
 
           {/* Telemetry Footer */}
-          <div className="sar-metrics grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-1">
-            <div className="p-2.5 rounded-lg bg-surface border border-border-subtle">
-              <div className="text-[10px] font-mono text-ink-tertiary uppercase">Contrast Ratio</div>
-              <div className="font-mono text-sm font-bold text-ink-primary mt-0.5">4.2 : 1</div>
-              <div className="text-[10px] text-verified font-medium">High Signal Separation</div>
+          <div className="sar-metrics grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-2">
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase font-semibold">Contrast Ratio</div>
+              <div className="font-mono text-sm font-black text-white mt-0.5">4.2 : 1</div>
+              <div className="text-[10px] text-emerald-400 font-bold">High Signal Separation</div>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface border border-border-subtle">
-              <div className="text-[10px] font-mono text-ink-tertiary uppercase">Radar Backscatter</div>
-              <div className="font-mono text-sm font-bold text-ink-primary mt-0.5">-18.4 dB</div>
-              <div className="text-[10px] text-ink-secondary">Normalized cross-section</div>
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow">
+              <div className="text-[10px] font-mono text-sky-400 uppercase font-semibold">Radar Backscatter</div>
+              <div className="font-mono text-sm font-black text-white mt-0.5">-18.4 dB</div>
+              <div className="text-[10px] text-slate-300">Normalized cross-section</div>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface border border-border-subtle">
-              <div className="text-[10px] font-mono text-ink-tertiary uppercase">Boundary Gradient</div>
-              <div className="font-mono text-sm font-bold text-ink-primary mt-0.5">Sharp (0.88)</div>
-              <div className="text-[10px] text-ink-secondary">Steep dampening threshold</div>
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow">
+              <div className="text-[10px] font-mono text-cyan-400 uppercase font-semibold">Boundary Gradient</div>
+              <div className="font-mono text-sm font-black text-white mt-0.5">Sharp (0.88)</div>
+              <div className="text-[10px] text-slate-300">Steep dampening threshold</div>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface border border-border-subtle">
-              <div className="text-[10px] font-mono text-ink-tertiary uppercase">Segmentation Status</div>
-              <div className="font-mono text-sm font-bold text-ocean mt-0.5">COMPLETE</div>
-              <div className="text-[10px] text-ink-secondary">Mask vector extracted</div>
+            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow">
+              <div className="text-[10px] font-mono text-emerald-400 uppercase font-semibold">Segmentation Status</div>
+              <div className="font-mono text-sm font-black text-cyan-300 mt-0.5">COMPLETE</div>
+              <div className="text-[10px] text-slate-300">Mask vector extracted</div>
             </div>
           </div>
         </div>

@@ -39,50 +39,50 @@ export function Chapter02Watch() {
       ref={containerRef}
       className="chapter-section min-h-screen relative flex flex-col justify-end p-8 md:p-16 z-10 pointer-events-none"
     >
-      <div className="max-w-xl space-y-6 pb-12 pointer-events-auto">
-        <div className="watch-stagger inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur-md border border-border-subtle text-ink-tertiary text-xs font-mono tracking-widest uppercase">
-          <Compass size={12} className="text-ocean" />
+      <div className="max-w-xl space-y-6 pb-12 pointer-events-auto glass-card-cinematic p-8 sm:p-10 rounded-3xl">
+        <div className="watch-stagger inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 text-xs font-mono tracking-widest uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+          <Compass size={13} className="text-cyan-400" />
           CHAPTER 02 · MARITIME SURVEILLANCE
         </div>
 
         <div className="watch-stagger space-y-1">
-          <div className="font-mono text-xs text-ink-secondary uppercase tracking-widest">
+          <div className="font-mono text-xs text-cyan-400 uppercase tracking-widest font-bold">
             Vessels Tracked in Sector
           </div>
           <div className="flex items-baseline gap-4">
-            <div className="font-display text-7xl md:text-8xl font-bold text-ink-primary tracking-tight">
+            <div className="font-display text-7xl md:text-8xl font-black text-white tracking-tight drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)]">
               <AnimatedCounter value={247} />
             </div>
             <StatusBadge variant="info" status="LIVE FEED ACTIVE" pulse />
           </div>
         </div>
 
-        <p className="watch-stagger font-body text-base md:text-lg text-ink-secondary leading-relaxed max-w-lg">
-          Arabian Sea international shipping corridor west of Goa. High density transit of ultra-large crude carriers, bulkers, and regional traffic.
+        <p className="watch-stagger font-body text-base md:text-lg text-slate-200 leading-relaxed max-w-lg font-medium">
+          Arabian Sea international shipping corridor west of Goa. Continuous real-time tracking of ultra-large crude carriers, bulkers, and regional traffic.
         </p>
 
         {/* Telemetry card */}
-        <div className="watch-stagger grid grid-cols-3 gap-3 p-4 rounded-xl bg-white/80 backdrop-blur-md border border-border-subtle shadow-card text-left">
+        <div className="watch-stagger grid grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-2xl text-left">
           <div>
-            <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-wider flex items-center gap-1">
-              <Ship size={10} className="text-ocean" /> Sector Density
+            <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-1 font-semibold">
+              <Ship size={11} className="text-cyan-400" /> Sector Density
             </div>
-            <div className="font-mono text-sm font-semibold text-ink-primary mt-1">High Corridor</div>
-            <div className="text-[10px] text-ink-secondary">Tanker Transit Lane</div>
+            <div className="font-mono text-sm font-bold text-white mt-1">High Corridor</div>
+            <div className="text-[10px] text-slate-300">Tanker Transit Lane</div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-wider flex items-center gap-1">
-              <Waves size={10} className="text-marine" /> Sea State
+            <div className="text-[10px] font-mono text-sky-400 uppercase tracking-wider flex items-center gap-1 font-semibold">
+              <Waves size={11} className="text-sky-400" /> Sea State
             </div>
-            <div className="font-mono text-sm font-semibold text-ink-primary mt-1">Beaufort 3</div>
-            <div className="text-[10px] text-ink-secondary">Swell 1.1m · Wind 11 kts</div>
+            <div className="font-mono text-sm font-bold text-white mt-1">Beaufort 3</div>
+            <div className="text-[10px] text-slate-300">Swell 1.1m · 11 kts</div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-ink-tertiary uppercase tracking-wider flex items-center gap-1">
-              <ShieldCheck size={10} className="text-verified" /> Coverage
+            <div className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-1 font-semibold">
+              <ShieldCheck size={11} className="text-emerald-400" /> Coverage
             </div>
-            <div className="font-mono text-sm font-semibold text-ink-primary mt-1">94.2% Spatial</div>
-            <div className="text-[10px] text-ink-secondary">Terrestrial + Sat AIS</div>
+            <div className="font-mono text-sm font-bold text-white mt-1">94.2% Spatial</div>
+            <div className="text-[10px] text-slate-300">Terrestrial + Sat AIS</div>
           </div>
         </div>
       </div>

@@ -32,19 +32,22 @@ export function Chapter20Final() {
   return (
     <section
       ref={containerRef}
-      className="chapter-section min-h-screen relative flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 bg-surface-elevated text-ink-primary border-t border-ink-tertiary/20"
+      className="chapter-section min-h-screen relative flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 select-none"
     >
-      <div className="max-w-4xl mx-auto text-center flex flex-col items-center space-y-8 my-auto">
-        <div className="final-anim-elem inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean/10 text-ocean text-xs font-mono font-bold tracking-wider">
-          <Compass className="w-3.5 h-3.5" />
-          <span>MARITIME SURVEILLANCE WORKSTATION READY</span>
+      <div className="max-w-4xl mx-auto text-center flex flex-col items-center space-y-7 my-auto glass-card-cinematic p-8 sm:p-12 rounded-3xl">
+        <div className="final-anim-elem inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 text-xs font-mono font-bold tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+          <Compass className="w-3.5 h-3.5 text-cyan-400" />
+          <span>MARITIME INTELLIGENCE & FORENSIC SUITE READY</span>
         </div>
 
-        <h2 className="final-anim-elem text-5xl sm:text-7xl md:text-8xl font-display font-bold tracking-tight text-ink-primary">
+        <h2 className="final-anim-elem text-5xl sm:text-7xl md:text-8xl font-display font-black tracking-tight text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)]">
           From Space<br />to Suspect.
+          <span className="block text-2xl sm:text-4xl md:text-5xl font-extrabold mt-3 tracking-tight text-cinematic-cyan drop-shadow-[0_2px_15px_rgba(6,182,212,0.6)]">
+            From Investigation to Response.
+          </span>
         </h2>
 
-        <p className="final-anim-elem font-body text-lg md:text-xl text-ink-secondary max-w-2xl leading-relaxed">
+        <p className="final-anim-elem font-body text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed font-medium drop-shadow">
           SpillTrace AI bridges satellite radar observation, hydrodynamic ocean transport, and vessel kinematics to provide fast, explainable, and court-admissible maritime attribution.
         </p>
 

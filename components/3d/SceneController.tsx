@@ -98,17 +98,17 @@ export default function SceneController() {
   const targetCam = getInterpolatedCamera(chapter, progress);
 
   useFrame((_state, delta) => {
-    // Smooth camera position interpolation
-    camera.position.lerp(targetCam.position, 2.5 * delta);
+    // Smooth camera position interpolation with physical inertia
+    camera.position.lerp(targetCam.position, 2.2 * delta);
 
     // Smooth camera target interpolation
-    currentTarget.current.lerp(targetCam.target, 3.0 * delta);
+    currentTarget.current.lerp(targetCam.target, 2.6 * delta);
     camera.lookAt(currentTarget.current);
 
     // Smooth FOV interpolation if perspective camera
     if ('fov' in camera) {
       const persCamera = camera as THREE.PerspectiveCamera;
-      currentFov.current = THREE.MathUtils.lerp(currentFov.current, targetCam.fov, 2.5 * delta);
+      currentFov.current = THREE.MathUtils.lerp(currentFov.current, targetCam.fov, 2.2 * delta);
       if (Math.abs(persCamera.fov - currentFov.current) > 0.05) {
         persCamera.fov = currentFov.current;
         persCamera.updateProjectionMatrix();
@@ -118,12 +118,19 @@ export default function SceneController() {
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight intensity={1.2} position={[6, 4, 5]} color="#f8fafc" />
-      <pointLight intensity={0.5} position={[-6, -2, -4]} color="#0369a1" />
+      {/* 1. Unified Solar Illumination Engine (Single coherent directional sun) */}
+      <ambientLight intensity={0.14} color="#0c1e36" />
+      <directionalLight
+        intensity={1.4}
+        position={[5.0, 3.0, 4.0]}
+        color="#fffaf0"
+      />
+      {/* Soft atmospheric earthshine bounce on dark side */}
+      <pointLight intensity={0.25} position={[-5.0, -2.0, -4.0]} color="#0369a1" />
 
       {state.showStars && <Stars />}
 
+      {/* Planetary Group: Synchronized coordinate frame for Earth, Ocean, Clouds, Spill & Fleet */}
       <group rotation-y={0}>
         {state.showEarth && <Earth rotationSpeed={state.earthRotation} />}
         {state.showAtmosphere && <Atmosphere />}
@@ -137,26 +144,35 @@ export default function SceneController() {
           />
         )}
         {state.showProbabilityField && <ProbabilityField visible={state.showProbabilityField} intensity={0.8} />}
+
+        {/* 247 Maritime Fleet: Locked to geographic oceanic coordinates */}
+        {state.showShips && (
+          <ShipFleet
+            visibleCount={state.shipCount}
+            highlightedIndices={state.highlightedShips}
+          />
+        )}
       </group>
 
+      {/* LEO Spacecraft & Synthetic Aperture Radar Footprint */}
       {state.showSatellite && <Satellite visible={state.showSatellite} orbitProgress={progress} />}
-      {state.showScanBeam && <ScanBeam visible={state.showScanBeam} />}
-
-      {state.showShips && (
-        <ShipFleet
-          visibleCount={state.shipCount}
-          highlightedIndices={state.highlightedShips}
+      {state.showScanBeam && (
+        <ScanBeam
+          visible={state.showScanBeam}
+          scanProgress={progress}
+          state={chapter === 3 ? 'PENDING' : chapter === 4 ? 'SCANNING' : 'COMPLETE'}
         />
       )}
 
+      {/* Hydrodynamic Drift & Current Streamlines */}
       {state.showDriftPath && (
         <RouteTrail
           visible={state.showDriftPath}
           points={[
-            new THREE.Vector3(1.8, 0.4, 0.9),
-            new THREE.Vector3(1.6, 0.3, 1.2),
-            new THREE.Vector3(1.4, 0.2, 1.4),
-            new THREE.Vector3(1.2, 0.1, 1.6),
+            new THREE.Vector3(1.78, 0.42, 1.15),
+            new THREE.Vector3(1.65, 0.35, 1.30),
+            new THREE.Vector3(1.50, 0.28, 1.45),
+            new THREE.Vector3(1.35, 0.20, 1.58),
           ]}
         />
       )}

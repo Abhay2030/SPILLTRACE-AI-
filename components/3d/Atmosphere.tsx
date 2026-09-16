@@ -33,15 +33,15 @@ const fragmentShader = `
     float NdotL = dot(vWorldNormal, lightDir);
     float sunLit = smoothstep(-0.2, 0.35, NdotL);
 
-    // Deep cyan to oceanic blue atmospheric spectrum
-    vec3 atmosphereColor = mix(vec3(0.06, 0.42, 0.85), vec3(0.35, 0.76, 0.98), rim);
+    // Deep marine blue to soft azure atmospheric spectrum
+    vec3 atmosphereColor = mix(vec3(0.04, 0.38, 0.82), vec3(0.32, 0.72, 0.98), rim);
 
-    gl_FragColor = vec4(atmosphereColor, rim * sunLit * 0.45);
+    gl_FragColor = vec4(atmosphereColor, rim * sunLit * 0.42);
   }
 `;
 
 export default function Atmosphere() {
-  const radius = typeof ATMOSPHERE_RADIUS !== 'undefined' ? ATMOSPHERE_RADIUS : 2.048;
+  const radius = typeof ATMOSPHERE_RADIUS !== 'undefined' ? ATMOSPHERE_RADIUS : 2.036;
 
   const uniforms = useMemo(
     () => ({

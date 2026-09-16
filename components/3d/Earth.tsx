@@ -78,14 +78,35 @@ const earthFragmentShader = `
   }
 `;
 
-export default function Earth({ rotationSpeed = 0.0004 }: { rotationSpeed?: number }) {
+export default function Earth({ rotationSpeed = 0.00008 }: { rotationSpeed?: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-  // Generate and cache procedural high-fidelity textures
+  // Load authentic NASA Blue Marble textures with procedural fallback
   const textures = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    return generateEarthTextures();
+
+    const procedural = generateEarthTextures();
+    const loader = new THREE.TextureLoader();
+
+    // Load NASA Blue Marble photo textures
+    const dayMap = loader.load('/textures/earth-blue-marble.jpg', undefined, undefined, () => {
+      // Keep procedural fallback if load fails
+    });
+    dayMap.colorSpace = THREE.SRGBColorSpace;
+
+    const nightMap = loader.load('/textures/earth-night.jpg');
+    nightMap.colorSpace = THREE.SRGBColorSpace;
+
+    const specularMap = loader.load('/textures/earth-water.png');
+    const bumpMap = loader.load('/textures/earth-topology.png');
+
+    return {
+      dayMap: dayMap || procedural.dayMap,
+      nightMap: nightMap || procedural.nightMap,
+      specularMap: specularMap || procedural.specularMap,
+      bumpMap: bumpMap || procedural.bumpMap,
+    };
   }, []);
 
   const uniforms = useMemo(() => {
@@ -114,7 +135,7 @@ export default function Earth({ rotationSpeed = 0.0004 }: { rotationSpeed?: numb
   if (!uniforms) return null;
 
   return (
-    <mesh ref={meshRef} rotation={[0, 0.4, 0]}>
+    <mesh ref={meshRef}>
       <sphereGeometry args={[radius, 64, 64]} />
       <shaderMaterial
         ref={materialRef}

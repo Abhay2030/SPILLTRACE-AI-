@@ -18,13 +18,14 @@ const cloudVertexShader = `
 `;
 
 const cloudFragmentShader = `
+  uniform sampler2D uCloudMap;
   uniform float uTime;
   uniform vec3 uSunDirection;
   varying vec3 vNormal;
   varying vec2 vUv;
   varying vec3 vPosition;
 
-  // Multi-octave procedural cloud noise
+  // Multi-octave procedural cloud noise for evolving weather systems
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
   }
@@ -50,50 +51,68 @@ const cloudFragmentShader = `
   }
 
   void main() {
-    // Eastward planetary cloud circulation + gentle tropical vortex swirl
-    vec2 uvFlow = vUv * 7.5 + vec2(uTime * 0.003, sin(vUv.x * 3.14) * 0.02);
-    float cloudDensity = fbm(uvFlow);
+    // 1. Authentic Satellite Cloud Texture Lookup
+    vec2 uvOffset = vec2(vUv.x + uTime * 0.0008, vUv.y);
+    float satClouds = texture2D(uCloudMap, uvOffset).r;
 
-    // Natural cirrus and stratocumulus coverage (delicate wisps, not opaque blanket)
-    float rawAlpha = smoothstep(0.50, 0.74, cloudDensity);
+    // 2. Micro-evolution turbulence flow
+    vec2 flowUv = vUv * 8.0 + vec2(uTime * 0.002, sin(vUv.x * 3.14) * 0.015);
+    float turbulence = fbm(flowUv) * 0.22;
 
-    // Solar illumination and terminator tinting
+    // Composite authentic satellite weather pattern with fluid evolution
+    float cloudDensity = clamp(satClouds * 0.85 + turbulence, 0.0, 1.0);
+    float rawAlpha = smoothstep(0.18, 0.65, cloudDensity);
+
+    // 3. Solar illumination and terminator tinting
     vec3 lightDir = normalize(uSunDirection);
     float NdotL = dot(vNormal, lightDir);
-    float dayFactor = smoothstep(-0.1, 0.25, NdotL);
-    float sunset = exp(-pow((NdotL - 0.03) / 0.12, 2.0));
+    float dayFactor = smoothstep(-0.08, 0.22, NdotL);
+    float sunset = exp(-pow((NdotL - 0.03) / 0.11, 2.0));
 
     // Crisp white sunlit clouds with warm golden-amber rims at the terminator
     vec3 dayCloud = vec3(0.96, 0.98, 1.0);
-    vec3 sunsetCloud = vec3(1.0, 0.58, 0.32);
-    vec3 cloudColor = mix(dayCloud, sunsetCloud, sunset * 0.7);
+    vec3 sunsetCloud = vec3(1.0, 0.58, 0.30);
+    vec3 cloudColor = mix(dayCloud, sunsetCloud, sunset * 0.65);
 
-    // Night side attenuation: allows city lights to remain visible from orbit
-    float finalAlpha = rawAlpha * mix(0.12, 0.35, dayFactor);
+    // 4. Night side attenuation: allows city lights to remain visible from orbit
+    float finalAlpha = rawAlpha * mix(0.08, 0.40, dayFactor);
 
     gl_FragColor = vec4(cloudColor, finalAlpha);
   }
 `;
 
-export default function Clouds({ radius = 2.018 }: { radius?: number }) {
+export default function Clouds({ radius = 2.016 }: { radius?: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
+  const cloudTexture = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const loader = new THREE.TextureLoader();
+    const tex = loader.load('/textures/earth-clouds.png');
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    return tex;
+  }, []);
+
   const uniforms = useMemo(
     () => ({
+      uCloudMap: { value: cloudTexture },
       uTime: { value: 0 },
       uSunDirection: { value: new THREE.Vector3(5.0, 3.0, 4.0).normalize() },
     }),
-    []
+    [cloudTexture]
   );
 
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      // Authentic planetary zonal rotation
-      meshRef.current.rotation.y += 0.00018;
+      // Authentic planetary zonal circulation (distinct from surface rotation)
+      meshRef.current.rotation.y += 0.00014;
     }
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+      if (materialRef.current.uniforms.uCloudMap.value !== cloudTexture) {
+        materialRef.current.uniforms.uCloudMap.value = cloudTexture;
+      }
     }
   });
 

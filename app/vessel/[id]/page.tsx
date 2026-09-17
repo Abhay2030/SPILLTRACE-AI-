@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -6,6 +7,7 @@ import { DEMO_VESSELS } from '@/data/demo-vessels';
 import { Ship, AlertTriangle, ShieldCheck, ArrowLeft, ExternalLink, Navigation, Compass, Radio } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import AttributionExplainability from '@/components/incident/AttributionExplainability';
 
 export const metadata: Metadata = {
   title: 'Vessel Forensic Profile | SpillTrace AI',
@@ -16,18 +18,19 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
   const id = resolvedParams.id;
 
   // Lookup vessel by ID or slug
-  const vessel =
-    DEMO_VESSELS.find((v: any) => v.id === id || v.id.toLowerCase().includes(id.toLowerCase())) ||
-    DEMO_VESSELS[0];
+  const vessel = DEMO_VESSELS.find((v: any) => v.id === id || v.id.toLowerCase().includes(id.toLowerCase()));
+  if (!vessel) {
+    notFound();
+  }
 
-  const isPrimarySuspect = vessel.id === 'VESSEL-A-001';
+  const isPrimaryCandidate = vessel.id === 'VESSEL-A-001';
 
   return (
     <div className="min-h-screen bg-surface pt-24 pb-16 px-6 lg:px-12 max-w-7xl mx-auto space-y-8">
       {/* Top Breadcrumb & Data Mode */}
       <div className="flex items-center justify-between border-b border-ink-tertiary/15 pb-4">
         <Link
-          href="/investigate"
+          href="/"
           className="flex items-center gap-2 font-mono text-xs text-ink-secondary hover:text-ink-primary transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> BACK TO INVESTIGATION WORKSTATION
@@ -43,8 +46,8 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
               {vessel.name}
             </h1>
             <StatusBadge
-              variant={isPrimarySuspect ? 'critical' : 'neutral'}
-              status={isPrimarySuspect ? 'PRIMARY SUSPECT' : 'EXCLUDED / WATCH'}
+              variant={isPrimaryCandidate ? 'critical' : 'neutral'}
+              status={isPrimaryCandidate ? 'PRIMARY CANDIDATE' : 'EXCLUDED / WATCH'}
             />
           </div>
 
@@ -102,14 +105,14 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
               </div>
               <div className="flex justify-between border-b border-ink-tertiary/10 pb-2">
                 <dt className="text-ink-secondary">AIS Transponder Integrity</dt>
-                <dd className={cn("font-bold", isPrimarySuspect ? "text-critical" : "text-verified")}>
-                  {isPrimarySuspect ? '2-hr Gap Flagged' : '100% Broadcast'}
+                <dd className={cn("font-bold", isPrimaryCandidate ? "text-critical" : "text-verified")}>
+                  {isPrimaryCandidate ? '2-hr Gap Flagged' : '100% Broadcast'}
                 </dd>
               </div>
               <div className="flex justify-between pt-1">
                 <dt className="text-ink-secondary">Nearest Distance to Origin</dt>
                 <dd className="font-bold text-ink-primary">
-                  {isPrimarySuspect ? '1.2 km (Dead-Center)' : '8.2 km (Outside 80%)'}
+                  {isPrimaryCandidate ? '1.2 km (Dead-Center)' : '8.2 km (Outside 80%)'}
                 </dd>
               </div>
             </dl>
@@ -152,7 +155,7 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
         {/* Right Column: Historical AIS Track Waypoints & Analysis (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Anomaly Callout Banner */}
-          {isPrimarySuspect ? (
+          {isPrimaryCandidate ? (
             <div className="p-5 bg-critical/5 border border-critical/20 rounded-2xl space-y-2">
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-critical">
                 <AlertTriangle className="w-4 h-4 text-critical" />
@@ -173,6 +176,9 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
               </p>
             </div>
           )}
+
+          {/* Explainability Breakdown */}
+          <AttributionExplainability vessel={vessel} />
 
           {/* Historical Waypoints Table */}
           <div className="bg-white rounded-2xl border border-ink-tertiary/20 shadow-sm overflow-hidden">
@@ -198,7 +204,7 @@ export default async function VesselPage({ params }: { params: Promise<{ id: str
                 </thead>
                 <tbody className="divide-y divide-ink-tertiary/10 text-ink-secondary">
                   {vessel.aisTrack?.map((pt: any, idx: number) => {
-                    const isGapPoint = isPrimarySuspect && idx === 2;
+                    const isGapPoint = isPrimaryCandidate && idx === 2;
                     return (
                       <tr
                         key={idx}

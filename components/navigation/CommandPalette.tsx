@@ -45,7 +45,7 @@ const COMMANDS: CommandItem[] = [
   { id: 'about', label: 'System Architecture — SIH26143', category: 'Navigation', icon: LucideInfo, shortcut: 'G S', action: '/about' },
 
   // Candidate Vessels
-  { id: 'vessel-a', label: 'MT OCEANIC PIONEER (Primary Suspect · 94%)', category: 'Vessels', icon: LucideShip, shortcut: 'V A', action: 'select_vessel:V-001-ALPHA', detail: 'MMSI 419000123 · Crude Tanker · AIS Gap 14.2h' },
+  { id: 'vessel-a', label: 'MT OCEANIC PIONEER (Primary Candidate · 94%)', category: 'Vessels', icon: LucideShip, shortcut: 'V A', action: 'select_vessel:V-001-ALPHA', detail: 'MMSI 419000123 · Crude Tanker · AIS Gap 14.2h' },
   { id: 'vessel-b', label: 'MV GLOBAL TRADER (Candidate B · 32%)', category: 'Vessels', icon: LucideShip, shortcut: 'V B', action: 'select_vessel:V-002-BRAVO', detail: 'MMSI 419000456 · Bulk Carrier · No discharge' },
   { id: 'vessel-c', label: 'FV SEA HORSE (Candidate C · 12%)', category: 'Vessels', icon: LucideShip, shortcut: 'V C', action: 'select_vessel:V-003-CHARLIE', detail: 'MMSI 419000789 · Fishing Vessel · Size mismatch' },
 

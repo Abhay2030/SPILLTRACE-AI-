@@ -130,7 +130,7 @@ export function Chapter01Ocean() {
         <h1 className="hero-title font-display font-black text-6xl sm:text-7xl md:text-9xl text-white tracking-tight leading-none mb-3 drop-shadow-[0_10px_35px_rgba(0,0,0,0.95)]">
           SPILLTRACE AI
           <span className="block text-3xl sm:text-5xl md:text-6xl font-extrabold mt-3 tracking-tight text-cinematic-cyan drop-shadow-[0_4px_25px_rgba(6,182,212,0.7)]">
-            From Space to Suspect.
+            From Space to Candidate.
           </span>
         </h1>
 
@@ -141,7 +141,7 @@ export function Chapter01Ocean() {
 
         {/* Primary Action Buttons */}
         <div className="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-5">
-          <Link href="/investigate" className="w-full sm:w-auto">
+          <Link href="/" className="w-full sm:w-auto">
             <button className="group relative w-full sm:w-auto inline-flex items-center justify-center px-9 py-4 rounded-xl text-white font-bold text-sm sm:text-base uppercase tracking-wider bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-[0_0_35px_rgba(6,182,212,0.6)] border border-cyan-300/60 hover:scale-105 transition-all duration-300 cursor-pointer">
               <Compass className="w-5 h-5 mr-2 group-hover:rotate-45 transition-transform" />
               Start Investigation

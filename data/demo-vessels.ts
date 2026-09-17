@@ -18,7 +18,7 @@ export const DEMO_VESSELS: any[] = [
       trajectory: 87
     },
     missingData: 'LOW',
-    status: 'SUSPECT',
+    status: 'CANDIDATE',
     dataMode: 'DEMO',
     aisTrack: [
       { lat: 16.00, lng: 71.50, timestamp: '2026-09-13T08:00:00Z', speed: 12, heading: 145 },

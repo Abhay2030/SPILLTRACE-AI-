@@ -47,7 +47,7 @@ const CANDIDATES: CandidateVessel[] = [
     lengthM: 228,
     dwtTons: '115,000 DWT',
     evidenceScore: 91.4,
-    status: 'PRIMARY SUSPECT',
+    status: 'PRIMARY CANDIDATE',
     statusVariant: 'critical',
     rank: 1,
     highlightAnomaly: '2-hour AIS dark transmission gap with 3.2 kt speed drop directly intersecting the 80% origin ellipse.',

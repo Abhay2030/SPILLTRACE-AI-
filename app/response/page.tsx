@@ -62,14 +62,14 @@ export default function ResponsePage() {
         <DataModeIndicator mode="DEMO" />
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left: Tactical Response Map (64%) */}
-        <div className="w-[64%] h-full p-4 flex flex-col">
+        <div className="w-full lg:w-[64%] h-full min-h-[400px] p-4 flex flex-col">
           <InvestigationMap />
         </div>
 
         {/* Right: Response Management Workbench (36%) */}
-        <div className="w-[36%] h-full overflow-y-auto border-l border-ink-tertiary/15 bg-surface-subtle/30 p-6 space-y-6">
+        <div className="w-full lg:w-[36%] h-full overflow-y-auto border-l border-ink-tertiary/15 bg-surface-subtle/30 p-6 space-y-6">
           <div>
             <span className="font-mono text-xs text-ocean font-bold uppercase tracking-wider block mb-1">
               MARITIME LOGISTICS ENGINE

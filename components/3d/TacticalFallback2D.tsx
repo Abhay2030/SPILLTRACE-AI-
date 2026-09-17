@@ -212,7 +212,7 @@ export default function TacticalFallback2D() {
               <span className="text-amber-400">Level 5 (Continuous True Oil)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-500">SUSPECT:</span>
+              <span className="text-slate-500">CANDIDATE:</span>
               <span className="text-emerald-400">MT Horizon Trader (0.94)</span>
             </div>
           </div>

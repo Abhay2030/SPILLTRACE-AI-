@@ -152,7 +152,7 @@ export function Chapter13WhyVessel() {
                 <span className="font-mono text-xs text-ink-tertiary uppercase tracking-wider">
                   VESSEL ATTRIBUTION INDEX
                 </span>
-                <StatusBadge variant="critical" status="PRIMARY SUSPECT" />
+                <StatusBadge variant="critical" status="PRIMARY CANDIDATE" />
               </div>
 
               <h3 className="font-display text-2xl font-bold text-ink-primary">

@@ -161,7 +161,7 @@ export function Chapter14WhyNot() {
             <div className="p-4 bg-surface-subtle border-t border-ink-tertiary/15 flex items-center justify-between text-xs font-mono">
               <span className="text-ink-tertiary">ATTRIBUTION STATUS:</span>
               <div className="flex gap-4">
-                <span className="text-critical font-bold">Vessel A: 91.4% (CULPRIT)</span>
+                <span className="text-critical font-bold">Vessel A: 91.4% (SOURCE_VESSEL)</span>
                 <span className="text-ink-tertiary font-bold">Vessel B: 68.7% (EXCLUDED)</span>
               </div>
             </div>

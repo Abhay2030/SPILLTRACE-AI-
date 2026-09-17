@@ -46,5 +46,5 @@ export interface VesselCandidate {
   trajectoryConsistency: number;
   missingDataScore: ConfidenceLevel;
   rank: number;
-  investigationStatus: 'SUSPECT' | 'UNDER_REVIEW' | 'CLEARED' | 'INCONCLUSIVE';
+  investigationStatus: 'CANDIDATE' | 'UNDER_REVIEW' | 'CLEARED' | 'INCONCLUSIVE';
 }

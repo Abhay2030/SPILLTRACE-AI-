@@ -106,7 +106,7 @@ const GRAPH_NODES: GraphNode[] = [
     cx: 300,
     cy: 420,
     icon: Ship,
-    status: '91.4% SUSPECT',
+    status: '91.4% CANDIDATE',
     badgeVariant: 'critical',
     summary: 'Coincident in time and space with 2-hour transponder gap and deceleration. Conforms 94% to drift.',
     provenance: 'Multi-Modal Evidence Synthesis Engine',

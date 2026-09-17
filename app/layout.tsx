@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SpillTrace AI — From Space to Suspect",
+  title: "SpillTrace AI — From Space to Candidate",
   description: "Advanced maritime intelligence and spill investigation platform for Smart India Hackathon 2026.",
 };
 

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { ConfidenceBar } from '@/components/ui/ConfidenceBar';
@@ -7,6 +8,8 @@ import { DEMO_VESSELS } from '@/data/demo-vessels';
 import { formatTimestamp, formatArea, cn } from '@/lib/utils';
 import { Download, MapPin, Compass, ArrowRight, ShieldCheck, AlertTriangle, Layers, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import ProcessingPipeline from '@/components/incident/ProcessingPipeline';
+import PrintButton from '@/components/ui/PrintButton';
 
 export const metadata: Metadata = {
   title: 'Incident Dossier | SpillTrace AI',
@@ -15,6 +18,11 @@ export const metadata: Metadata = {
 export default async function IncidentPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const id = resolvedParams.id || 'ST-2026-0042';
+
+  if (id !== 'ST-2026-0042') {
+    notFound();
+  }
+
   const incident = DEMO_INCIDENT;
 
   const area = incident.spillCharacterization?.areaKm2 ?? 18.4;
@@ -41,17 +49,20 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="flex items-center gap-3">
+          <PrintButton />
           <Link
-            href="/investigate"
-            className="px-4 py-2 bg-ocean hover:bg-ocean/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-colors flex items-center gap-2 shadow-sm"
+            href="/"
+            className="px-4 py-2 bg-ocean hover:bg-ocean/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-colors flex items-center gap-2 shadow-sm print:hidden"
           >
             OPEN IN WORKSTATION <ArrowRight className="w-4 h-4" />
           </Link>
-          <DataModeIndicator mode="DEMO" />
+          <div className="print:hidden">
+            <DataModeIndicator mode="DEMO" />
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 print:block print:space-y-8">
         {/* Left Column (4 cols): Sensor Metadata & Threat */}
         <div className="lg:col-span-4 space-y-6">
           {/* Spatial Coordinate Card */}
@@ -117,6 +128,54 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
+          {/* Look-Alike Classification */}
+          <div className="bg-white rounded-2xl border border-ink-tertiary/20 p-6 shadow-sm space-y-4">
+            <h3 className="font-display font-bold text-base text-ink-primary">
+              Look-Alike Discrimination
+            </h3>
+            <div className="space-y-2 font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-ink-secondary">Anthropogenic Oil</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                    <div className="h-full bg-verified rounded-full" style={{width: '94.2%'}} />
+                  </div>
+                  <span className="font-bold text-verified w-12 text-right">94.2%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-ink-secondary">Biogenic Film (Algae)</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                    <div className="h-full bg-warning rounded-full" style={{width: '3.1%'}} />
+                  </div>
+                  <span className="font-bold text-ink-secondary w-12 text-right">3.1%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-ink-secondary">Wind-Roughness Slick</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                    <div className="h-full bg-ink-tertiary rounded-full" style={{width: '1.8%'}} />
+                  </div>
+                  <span className="font-bold text-ink-secondary w-12 text-right">1.8%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-ink-secondary">Uncertain / Unclassified</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-surface-subtle rounded-full overflow-hidden">
+                    <div className="h-full bg-ink-tertiary/50 rounded-full" style={{width: '0.9%'}} />
+                  </div>
+                  <span className="font-bold text-ink-secondary w-12 text-right">0.9%</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-[10px] font-mono text-ink-tertiary border-t border-ink-tertiary/10 pt-3">
+              Classification: Multi-feature SAR Discriminator (VV/VH Dampening Ratio + Texture Homogeneity + Shape Regularity)
+            </p>
+          </div>
+
           {/* Threat Assessment */}
           <div className="bg-white rounded-2xl border border-ink-tertiary/20 p-6 shadow-sm space-y-3">
             <h3 className="font-display font-bold text-base text-ink-primary">
@@ -142,6 +201,8 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
 
         {/* Right Column (8 cols): Candidate Vessels & Forensic Chains */}
         <div className="lg:col-span-8 space-y-6">
+          <ProcessingPipeline />
+          
           {/* Candidate Vessels Table */}
           <div className="bg-white rounded-2xl border border-ink-tertiary/20 shadow-sm overflow-hidden">
             <div className="p-4 bg-surface-subtle border-b border-ink-tertiary/10 flex items-center justify-between font-mono text-xs">
@@ -254,6 +315,47 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
                   <span className="font-bold text-ink-primary">INCOIS 0.38 m/s @ 045°</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Incident Timeline */}
+          <div className="bg-white rounded-2xl border border-ink-tertiary/20 shadow-sm overflow-hidden">
+            <div className="p-4 bg-surface-subtle border-b border-ink-tertiary/10 font-mono text-xs font-bold text-ink-primary">
+              INCIDENT EVENT TIMELINE
+            </div>
+            <div className="p-6 space-y-0">
+              {[
+                { time: 'T-14H', event: 'MT OCEANIC PIONEER enters surveillance sector', type: 'vessel' },
+                { time: 'T-12H', event: 'AIS speed anomaly detected (12 kts to 4 kts)', type: 'anomaly' },
+                { time: 'T-8H', event: 'Estimated discharge window begins', type: 'critical' },
+                { time: 'T-4H', event: 'MT OCEANIC PIONEER exits origin zone', type: 'vessel' },
+                { time: 'T0', event: 'Sentinel-1A SAR acquisition over Arabian Sea', type: 'detection' },
+                { time: 'T+12M', event: 'Automated dark-spot anomaly flagged', type: 'detection' },
+                { time: 'T+18M', event: 'AI classification: 94.2% Oil Probability', type: 'critical' },
+                { time: 'T+45M', event: 'Drift backtrack initiated (Lagrangian)', type: 'analysis' },
+                { time: 'T+1H', event: 'AIS correlation identifies 3 candidates', type: 'analysis' },
+                { time: 'T+2H', event: 'Attribution report generated', type: 'report' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 group">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-3 h-3 rounded-full border-2 ${
+                      item.type === 'critical' ? 'border-critical bg-critical/20' :
+                      item.type === 'detection' ? 'border-ocean bg-ocean/20' :
+                      item.type === 'anomaly' ? 'border-warning bg-warning/20' :
+                      'border-ink-tertiary bg-surface-subtle'
+                    }`} />
+                    {i < 9 && <div className="w-px h-8 bg-border-subtle" />}
+                  </div>
+                  <div className="pb-6">
+                    <span className={`font-mono text-[10px] font-bold uppercase ${
+                      item.type === 'critical' ? 'text-critical' :
+                      item.type === 'detection' ? 'text-ocean' :
+                      'text-ink-tertiary'
+                    }`}>{item.time}</span>
+                    <p className="text-xs text-ink-primary mt-0.5">{item.event}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

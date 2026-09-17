@@ -35,7 +35,7 @@ const CHAPTER_LABELS = [
   'Scenario Simulation',
   'Continuous Monitoring',
   'Complete System',
-  'From Space to Suspect',
+  'From Space to Candidate',
 ];
 
 interface DemoControllerProps {

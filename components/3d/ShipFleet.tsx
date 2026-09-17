@@ -15,7 +15,7 @@ interface ShipInstance {
   widthScale: number;
   color: string;
   wakeLength: number;
-  isSuspect: boolean;
+  isCandidate: boolean;
 }
 
 export default function ShipFleet({
@@ -46,7 +46,7 @@ export default function ShipFleet({
       let lengthScale: number;
       let widthScale: number;
       let color: string;
-      let isSuspect = i === 0; // Index 0 is MV Horizon Trader
+      let isCandidate = i === 0; // Index 0 is MV Horizon Trader
 
       if (i === 0) {
         // MV Horizon Trader (Candidate A - Crude Oil Tanker)
@@ -141,7 +141,7 @@ export default function ShipFleet({
         widthScale,
         color,
         wakeLength: Math.max(0.008, (speedKts / 20.0) * 0.035 * lengthScale),
-        isSuspect,
+        isCandidate,
       });
     }
 
@@ -172,7 +172,7 @@ export default function ShipFleet({
       const y = radius * Math.sin(effectiveLat);
       const z = radius * Math.cos(effectiveLat) * Math.cos(effectiveLon);
 
-      const isHighlighted = highlightedIndices.includes(i) || vessel.isSuspect && highlightedIndices.length > 0;
+      const isHighlighted = highlightedIndices.includes(i) || vessel.isCandidate && highlightedIndices.length > 0;
       const baseScale = isHighlighted ? 2.2 : 1.0;
 
       // 1. POSITION HULL

@@ -366,7 +366,7 @@ export default function InvestigationMap({
           new maplibregl.Popup({ offset: 15 }).setHTML(`
             <div class="p-2 font-mono text-xs text-ink-primary">
               <strong class="text-critical block">MV HORIZON TRADER</strong>
-              <span>Score: 91.4% (PRIMARY SUSPECT)</span><br/>
+              <span>Score: 91.4% (PRIMARY CANDIDATE)</span><br/>
               <span class="text-ink-tertiary">Flag: Panama · Tanker (115,000 DWT)</span><br/>
               <span class="text-amber-600 font-bold">2-Hour AIS Silence Gap</span>
             </div>

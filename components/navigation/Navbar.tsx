@@ -141,7 +141,7 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               label={link.label}
-              active={pathname === link.href || (link.href === '/' && pathname === '/investigate')}
+              active={pathname === link.href || (link.href === '/' && pathname === '/')}
             />
           ))}
         </nav>

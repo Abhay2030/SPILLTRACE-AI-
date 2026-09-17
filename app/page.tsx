@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import dynamic from 'next/dynamic';
 import { DataModeIndicator } from '@/components/ui/DataModeIndicator';
@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import InvestigationWorkflow from '@/components/workstation/InvestigationWorkflow';
 import WorkstationContextPanel from '@/components/workstation/WorkstationContextPanel';
 import InvestigationTimeline from '@/components/workstation/InvestigationTimeline';
+import DemoController from '@/components/demo/DemoController';
 
 // Legacy Chapters (now used only for Presentation Mode)
 const Chapter01 = dynamic(() => import('@/components/homepage/Chapter01Ocean').then(m => m.Chapter01Ocean));
@@ -70,6 +71,7 @@ export default function HomePage() {
       */}
       {presentationMode && (
         <div className="relative z-20 pointer-events-auto">
+          <DemoController />
           <Chapter01 />
           <Chapter02 />
           <Chapter03 />
@@ -95,3 +97,4 @@ export default function HomePage() {
     </div>
   );
 }
+

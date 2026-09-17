@@ -41,7 +41,7 @@ export function Chapter20Final() {
         </div>
 
         <h2 className="final-anim-elem text-5xl sm:text-7xl md:text-8xl font-display font-black tracking-tight text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.9)]">
-          From Space<br />to Suspect.
+          From Space<br />to Candidate.
           <span className="block text-2xl sm:text-4xl md:text-5xl font-extrabold mt-3 tracking-tight text-cinematic-cyan drop-shadow-[0_2px_15px_rgba(6,182,212,0.6)]">
             From Investigation to Response.
           </span>
@@ -54,7 +54,7 @@ export function Chapter20Final() {
         {/* Action Button Group */}
         <div className="final-anim-elem flex flex-col sm:flex-row gap-4 items-center justify-center w-full max-w-lg pt-4">
           <Link
-            href="/investigate"
+            href="/"
             className="w-full sm:w-auto px-8 py-4 bg-ocean hover:bg-ocean/90 text-white rounded-xl font-mono text-xs font-bold tracking-wider transition-all shadow-md flex items-center justify-center gap-2 group"
           >
             START INVESTIGATION

@@ -1,5 +1,9 @@
- SPILLTRACE AI
+****SPILLTRACE AI**
+
+
+
 ![Uploading Spil Traces logo 2.png…]()
+
 
 <p align="center">
   <strong>Maritime Geospatial Intelligence for Oil-Spill Detection, Source Reconstruction and Vessel Attribution</strong>

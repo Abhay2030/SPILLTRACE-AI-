@@ -3,10 +3,7 @@
 <p align="center">
   <strong>Maritime Geospatial Intelligence for Oil-Spill Detection, Source Reconstruction & Vessel Attribution</strong>
 </p>
-
-<p align="center">
-  <img src="SpillTraceAI_logo.jpeg" alt="SpillTrace AI Logo" width="220">
-</p>
+<img src="SpillTraceAI_logo.jpeg" alt="SpillTrace AI Logo" width="220">
 
 ---
 

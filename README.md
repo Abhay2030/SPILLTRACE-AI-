@@ -18,32 +18,6 @@ Rather than stopping at spill detection, SpillTrace is designed to support the c
 DETECT → LOCATE → TRACE → RECONSTRUCT → CORRELATE → ATTRIBUTE → RESPOND
 
 
-
-````markdown
-# 🚢 SpillTrace AI
-
-<p align="center">
-  <strong>Maritime Geospatial Intelligence for Oil-Spill Detection, Source Reconstruction & Vessel Attribution</strong>
-</p>
-
-<p align="center">
-  <img src="SpillTraceAI_logo.jpeg" alt="SpillTrace AI Logo" width="220">
-</p>
-
----
-
-## 🌍 Overview
-
-**SpillTrace AI** is a maritime geospatial intelligence platform that integrates **satellite imagery, oceanographic data, geospatial intelligence, and AIS vessel tracking** into a unified investigation workflow.
-
-Rather than stopping at spill detection, SpillTrace is designed to support the complete investigative chain:
-
-```text
-DETECT → LOCATE → TRACE → RECONSTRUCT → CORRELATE → ATTRIBUTE → RESPOND
-````
-
----
-
 ## 🎯 Problem Statement
 
 **Smart India Hackathon 2026 — Disaster Management**
